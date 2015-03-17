@@ -52,7 +52,7 @@ open($tt, '>', $outfile) or die "Could not open file $outputfile: $!";
 # create head of file table_teams.dat
 # and the hash results is defined
 printf $tt "# sp\t";
-for $i ( 0 $#{ @teams_name; ++$i ) {
+for $i ( 0 .. $#{ @results{names} } ) {
     $results{games}[$i] = 0;
     $results{won}[$i] = 0;
     $results{lost}[$i] = 0;
@@ -63,7 +63,7 @@ for $i ( 0 $#{ @teams_name; ++$i ) {
     $results{gdiff}[$i] = 0;
     $results{points}[$i] = 0;
 
-    printf $tt "\t%s", $teams_abbr[$i];
+    printf $tt "\t%s", $results{abbrs}[$i];
 }
 printf $tt "\n";
 
@@ -127,25 +127,19 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
     $outfile = $dir."table_sp".$sp.".dat";
     open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
 
-    if ( sum ( @{ $results{played} } ) == 0 ){
+    if ( sum ( @{ $results{played} } ) != 0 ){
+	print "$sp\n";
 	# sorting bei points, then diff goals and then played games.
 	my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 			     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
 			     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} };
 	pop @idx;
 
-	@{ $results_tmp{names} }   = @{ $results{names} }[@idx];
 	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
 	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
-	@{ $results_tmp{gcontra} } = @{ $results{gcontra} }[@idx];
-	@{ $results_tmp{gfavor} }  = @{ $results{gfavor} }[@idx];
-	@{ $results_tmp{gdiff} }   = @{ $results{gdiff} }[@idx];
-	@{ $results_tmp{won} }     = @{ $results{won} }[@idx];
-	@{ $results_tmp{lost} }    = @{ $results{lost} }[@idx];
-	@{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
 
 	for  $i ( 0 .. $#{ $results{names} } ) {
-	    printf $of "%s %.0f\n", $results_tmp{abbr}[$i], $results_tmp{points}[$i];
+	    printf $of "%s\n", $results_tmp{abbrs}[$i];
 	}
 
 	printf $tt "   $sp\t";
@@ -185,11 +179,12 @@ pop @idx;
 @{ $results_tmp{won} }     = @{ $results{won} }[@idx];
 @{ $results_tmp{lost} }    = @{ $results{lost} }[@idx];
 @{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
-@{ $results_tmp{games} }    = @{ $results{games} }[@idx];
+@{ $results_tmp{games} }   = @{ $results{games} }[@idx];
 
 for $i ( 0 .. $#{ $results{names} } ) {
-    printf $of "%s %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
-    $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], $results_tmp{gfdiff}[$i];
+    printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
+    $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 
+    $results_tmp{won}[$i], $results_tmp{lost}[$i], $results_tmp{draw}[$i];
 }
 
 close $of;
