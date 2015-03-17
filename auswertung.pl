@@ -6,17 +6,18 @@ use File::Basename;    # to get the file name without extension
 use POSIX;
 use Data::Dumper;
 use Scalar::Util qw(looks_like_number);
-
+use List::Util qw(sum);
 
 $league = $ARGV[0];
 
 my $dir = './';
-$rteams = $dir.$league."_teams.dat";
-$rgames = $dir.$league."_date.dat";
 
 # read games
+$rgames = $dir.$league."_date.dat";
 open my $fh, "<", $rgames or die "can't read open '$fp': $OS_ERROR";
 $ngames = 0;
+
+# read the dates and save them in the array calendar 
 while ( $line = <$fh> ) {
     @splitline = split("&", $line);
     $ngames += 1;
@@ -24,106 +25,140 @@ while ( $line = <$fh> ) {
 }
 close $fh or die "can't read close '$fp': $OS_ERROR";
 
+
 # read teams
+$rteams = $dir.$league."_teams.dat";
 open my $fh, "<", $rteams or die "can't read open '$fp': $OS_ERROR";
 $nteams = 0;
+
+# read the teams name save them in the array teams_name and teams_abbr 
 while ( $line = <$fh> ) {
     @splitline = split("&", $line);
     $nteams += 1;
-    push( @teams_name, @splitline[0] );
-    push( @teams_abbr, @splitline[1] );
+
+    push( @{ $results{names} }, @splitline[0] );
+    push( @{ $results{abbrs} }, @splitline[1] );
 }
 close $fh or die "can't read close '$fp': $OS_ERROR";
 
-s{^\s+|\s+$}{}g foreach @teams_name;
-s{^\s+|\s+$}{}g foreach @teams_abbr;
+# delete spaces before and after the text
+s{^\s+|\s+$}{}g foreach @{ $results{names} };
+s{^\s+|\s+$}{}g foreach @{ $results{abbrs} };
 
-my @results;
-# results[][0] played games
-# results[][1] won
-# results[][2] lost
-# results[][3] draw
-# results[][4] goals favor
-# results[][5] goals contra
-# results[][6] goals diff
-# results[][7] points
-# results[][8] team name
-
-for ( my $i = 0; $i < @teams_name; ++$i ) {
-   $results[$i][8] = $teams_abbr[$i];
-}
-
+# this file contains the data to be plotted
 $outfile = $dir."table_teams.dat";
 open($tt, '>', $outfile) or die "Could not open file $outputfile: $!";	
 
+# create head of file table_teams.dat
+# and the hash results is defined
 printf $tt "# sp\t";
-for ( $i = 0; $i < @teams_name; ++$i ) {
+for $i ( 0 $#{ @teams_name; ++$i ) {
+    $results{games}[$i] = 0;
+    $results{won}[$i] = 0;
+    $results{lost}[$i] = 0;
+    $results{draw}[$i] = 0;
+    $results{gfavor}[$i] = 0;
+    $results{gcontra}[$i] = 0;
+    $results{gcontra}[$i] = 0;
+    $results{gdiff}[$i] = 0;
+    $results{points}[$i] = 0;
+
     printf $tt "\t%s", $teams_abbr[$i];
 }
 printf $tt "\n";
 
+
 $sp = 0;
 foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
-    $played_sp = 0 ; # if a game was played 
+
     $sp += 1;
+    for $i ( 0 .. $#{ $results{names} } ) {
+	$results{played}[$i] = 0;
+    }
+
     open my $fh, "<", $ft or die "can't read open '$fp': $OS_ERROR";
+
     while ( $line = <$fh> ) {
 	@splitline = split("&", $line);
-	s{^\s+|\s+$}{}g foreach @splitline;
+	s{^\s+|\s+$}{}g foreach @splitline; # delete spaces before and after the text
 
-	for ( $i = 0; $i < @teams_name; ++$i ) {
-	    if ( $teams_name[$i] eq $splitline[1] ) {
+	for $i ( 0 .. $#{ $results{names} } ) {
+
+	    if ( $results{names}[$i] eq $splitline[1] ) {
 		if ( looks_like_number($splitline[3]) ) {
-		    $played_sp = 1 ; # if a game was played 
-		    $results[$i][0] += 1;                             # played games
-		    $results[$i][4] += $splitline[3];                 # goals favor
-		    $results[$i][5] += $splitline[4];                 # goals contra
-		    $results[$i][6] += $splitline[3] - $splitline[4]; # difference
+		    $results{played}[$i]  = 1;
+		    $results{games}[$i]   += 1;                             
+		    $results{gfavor}[$i]  += $splitline[3];                
+		    $results{gcontra}[$i] += $splitline[4];               
+		    $results{gdiff}[$i]   += $splitline[3] - $splitline[4]; 
 		    if ( $splitline[3] > $splitline[4] ) {      # victory
-			$results[$i][1] += 1; # won 
-			$results[$i][7] += 3; # points
+			$results{won}[$i]    += 1;
+			$results{points}[$i] += 3;
 		    } elsif ( $splitline[3] < $splitline[4] ) { # defeat
-			$results[$i][2] += 1; # lost
+			$results{lost}[$i] += 1; 
 		    } else {                                    # draw
-			$results[$i][3] += 1; # draw
-			$results[$i][7] += 1; # points
+			$results{draw}[$i] += 1; 
+			$results{points}[$i]  += 1;
 		    }
 		}
 	    }
 
-	    if ( $teams_name[$i] eq $splitline[2] ) {
+	    if ( $results{names}[$i] eq $splitline[2] ) {
 		if ( looks_like_number($splitline[3]) ) {
-		    $results[$i][0] += 1;                             # played games
-		    $results[$i][4] += $splitline[4];                 # goals favor
-		    $results[$i][5] += $splitline[3];                 # goals contra
-		    $results[$i][6] += $splitline[4] - $splitline[3]; # difference
+		    $results{played}[$i]  = 1;
+		    $results{games}[$i]   += 1;  
+		    $results{gfavor}[$i]  += $splitline[4];                
+		    $results{gcontra}[$i] += $splitline[3];                
+		    $results{gdiff}[$i]   += $splitline[4] - $splitline[3];
 		    if ( $splitline[3] > $splitline[4] ) {      # defeat
-			$results[$i][2] += 1; # lost
+			$results{lost}[$i] += 1; 
 		    } elsif ( $splitline[3] < $splitline[4] ) { # victory
-			$results[$i][1] += 1; # won 
-			$results[$i][7] += 3; # points
+			$results{won}[$i]    += 1;
+			$results{points}[$i] += 3; 
 		    } else {                                    # draw
-			$results[$i][3] += 1; # draw
-			$results[$i][7] += 1; # points
+			$results{draw}[$i]   += 1; 
+			$results{points}[$i] += 1;
 		    }
 		}
 	    }
-
 	}
     }
 
     $outfile = $dir."table_sp".$sp.".dat";
     open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
 
-    if ( $played_sp == 1 ){
+    if ( sum ( @{ $results{played} } ) == 0 ){
 	# sorting bei points, then diff goals and then played games.
-	@results_tmp =  sort { -$a->[7] <=> -$b->[7] || 
-				   -$a->[6] <=> -$b->[6] || 
-				   $a->[0] <=> $b->[0] } @results;
-	
-	for ( $i = 0; $i < @teams_name; ++$i ) {
-	    printf $of "%s %.0f\n", $results_tmp[$i][8], $results_tmp[$i][7];
+	my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
+			     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
+			     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} };
+	pop @idx;
+
+	@{ $results_tmp{names} }   = @{ $results{names} }[@idx];
+	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
+	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
+	@{ $results_tmp{gcontra} } = @{ $results{gcontra} }[@idx];
+	@{ $results_tmp{gfavor} }  = @{ $results{gfavor} }[@idx];
+	@{ $results_tmp{gdiff} }   = @{ $results{gdiff} }[@idx];
+	@{ $results_tmp{won} }     = @{ $results{won} }[@idx];
+	@{ $results_tmp{lost} }    = @{ $results{lost} }[@idx];
+	@{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
+
+	for  $i ( 0 .. $#{ $results{names} } ) {
+	    printf $of "%s %.0f\n", $results_tmp{abbr}[$i], $results_tmp{points}[$i];
 	}
+
+	printf $tt "   $sp\t";
+	for $i (  0 .. $#{ $results{names} } ) {
+	    if ( $results{played}[$i] == 1 ) {
+		printf $tt "\t\t%s", $results{points}[$i];
+	    } else {
+		printf $tt "\t\t%s", "&";
+	    }
+	}
+	printf $tt "\n";
+
+
     } else {
 	printf $of "\n";
     }
@@ -135,13 +170,26 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 $outfile = $dir."final_table.dat";
 open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
 
-@results_tmp =  sort { -$a->[7] <=> -$b->[7] || 
-			   -$a->[6] <=> -$b->[6] || 
-			   $a->[0] <=> $b->[0] } @results;
+# sorting bei points, then diff goals and then played games.
+my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
+		     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
+		     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} };
+pop @idx;
 
-for ( $i = 0; $i < @teams_name; ++$i ) {
-    printf $of "%s %.0f %.0f %.0f\n", $results_tmp[$i][8], $results_tmp[$i][7], 
-    $results_tmp[$i][6], $results_tmp[$i][0];
+@{ $results_tmp{names} }   = @{ $results{names} }[@idx];
+@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
+@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
+@{ $results_tmp{gcontra} } = @{ $results{gcontra} }[@idx];
+@{ $results_tmp{gfavor} }  = @{ $results{gfavor} }[@idx];
+@{ $results_tmp{gdiff} }   = @{ $results{gdiff} }[@idx];
+@{ $results_tmp{won} }     = @{ $results{won} }[@idx];
+@{ $results_tmp{lost} }    = @{ $results{lost} }[@idx];
+@{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
+@{ $results_tmp{games} }    = @{ $results{games} }[@idx];
+
+for $i ( 0 .. $#{ $results{names} } ) {
+    printf $of "%s %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
+    $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], $results_tmp{gfdiff}[$i];
 }
 
 close $of;
