@@ -193,9 +193,9 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		if ( $idx[$i] == $idxold[$i] ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 		} elsif ( $idx[$i] < $idxold[$i] ) {
-		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
-		} else {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
+		} else {
+		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
 		}
 	    } else {
 		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
