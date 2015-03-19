@@ -12,6 +12,55 @@ $league = $ARGV[0];
 
 my $dir = './';
 
+
+# gnuplot file
+$outfile_plot = $dir.$league."_plot.gp";
+open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
+
+printf $tgp "%s\n", "set terminal pdf enhanced fsize 10 fname 'Helvetica' linewidth 1.0 color size 11.7in,8.3in";
+printf $tgp "%s%s%s\n", "set output '", $league,"_plot.pdf'";
+printf $tgp "%s\n", "set grid ytics";
+printf $tgp "%s\n", "set xlabel 'Spieltag'";
+printf $tgp "%s\n", "set ylabel 'Punkten'";
+
+# #set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
+
+# printf $tgp "%s\n", "set xrange [0.5:27.5]";
+# printf $tgp "%s\n", "set xtics 1";
+# printf $tgp "%s\n", "set yrange [0:60]";
+# printf $tgp "%s\n", "set ytics 52";
+
+# set key at 29,30 reverse title "g points tor+ tor- s u l"
+
+# set label 11 "WEILH 1  WEILH 2" at 0.5,-3 tc rgb 'gray' font "Helvetica,5"
+# set label 12 "WEILH 1  WEILH 2" at 0.5,-4 tc rgb 'gray' font "Helvetica,5"
+# set label 13 "WEILH 1  WEILH 2" at 0.5,-5 tc rgb 'gray' font "Helvetica,5"
+# set label 14 "WEILH 1  WEILH 2" at 0.5,-6 tc rgb 'gray' font "Helvetica,5"
+# set label 15 "WEILH 1  WEILH 2" at 0.5,-7 tc rgb 'gray' font "Helvetica,5"
+
+# set label 16 "WEILH 1  WEILH 2" at 1.5,-9 tc rgb 'gray' font "Helvetica,5"
+# set label 17 "WEILH 1  WEILH 2" at 1.5,-10 tc rgb 'gray' font "Helvetica,5"
+# set label 18 "WEILH 1  WEILH 2" at 1.5,-11 tc rgb 'gray' font "Helvetica,5"
+# set label 19 "WEILH 1  WEILH 2" at 1.5,-12 tc rgb 'gray' font "Helvetica,5"
+# set label 20 "WEILH 1  WEILH 2" at 1.5,-13 tc rgb 'gray' font "Helvetica,5"
+
+# set label 3 "WEILH" at 0.5,64.5 tc rgb 'gray' font "Helvetica,6"
+# set label 4 "WM3"   at 0.5,63.5 tc rgb 'gray' font "Helvetica,6"
+# set label 5 "WM4"   at 0.5,62.5 tc rgb 'gray' font "Helvetica,6"
+# set label 6 "WM5"   at 0.5,61.5 tc rgb 'gray' font "Helvetica,6"
+# set label 7 "WM6"   at 0.5,60.5 tc rgb 'gray' font "Helvetica,6"
+# set label 8 "WM1"   at 0.5,65.5 tc rgb 'gray' font "Helvetica,6"
+# set label 9 "WM2"   at 0.5,66.5 tc rgb 'gray' font "Helvetica,6"
+# set label 10 "WM3"  at 0.5,67.5 tc rgb 'gray' font "Helvetica,6"
+# set label 11 "WM4"  at 0.5,68.5 tc rgb 'gray' font "Helvetica,6"
+
+# set size   0.9, 0.75
+# set origin 0.0, 0.15
+
+# plot \
+# '../data/gh_dehnung.dat' u 4:6 title "WM 13 17 1-1 4 6 7" w p pt 7 ps 2
+
+
 # read games
 $rgames = $dir.$league."_date.dat";
 open my $fh, "<", $rgames or die "can't read open '$fp': $OS_ERROR";
@@ -96,6 +145,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 			$results{points}[$i] += 3;
 		    } elsif ( $splitline[3] < $splitline[4] ) { # defeat
 			$results{lost}[$i] += 1; 
+			$results{points}[$i]  += 0;
 		    } else {                                    # draw
 			$results{draw}[$i] += 1; 
 			$results{points}[$i]  += 1;
@@ -111,7 +161,8 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		    $results{gcontra}[$i] += $splitline[3];                
 		    $results{gdiff}[$i]   += $splitline[4] - $splitline[3];
 		    if ( $splitline[3] > $splitline[4] ) {      # defeat
-			$results{lost}[$i] += 1; 
+			$results{lost}[$i]   += 1; 
+			$results{points}[$i] += 0;
 		    } elsif ( $splitline[3] < $splitline[4] ) { # victory
 			$results{won}[$i]    += 1;
 			$results{points}[$i] += 3; 
@@ -128,19 +179,30 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
     open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
 
     if ( sum ( @{ $results{played} } ) != 0 ){
-	print "$sp\n";
+	print "     $sp\n";
 	# sorting bei points, then diff goals and then played games.
 	my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 			     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
-			     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} };
-	pop @idx;
+			     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} } - 1;
 
 	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
 	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
 
 	for  $i ( 0 .. $#{ $results{names} } ) {
-	    printf $of "%s\n", $results_tmp{abbrs}[$i];
+	    if ( exists $idxold[$i] ) {
+		if ( $idx[$i] == $idxold[$i] ) {
+		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
+		} elsif ( $idx[$i] < $idxold[$i] ) {
+		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
+		} else {
+		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
+		}
+	    } else {
+		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
+	    }
 	}
+	    
+	@idxold = @idx;
 
 	printf $tt "   $sp\t";
 	for $i (  0 .. $#{ $results{names} } ) {
@@ -167,8 +229,7 @@ open($of, '>', $outfile) or die "Could not open file $outputfile: $!";
 # sorting bei points, then diff goals and then played games.
 my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 		     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
-		     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} };
-pop @idx;
+		     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} } - 1;
 
 @{ $results_tmp{names} }   = @{ $results{names} }[@idx];
 @{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
