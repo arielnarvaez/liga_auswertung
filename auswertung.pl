@@ -10,56 +10,21 @@ use List::Util qw(sum);
 
 $league = $ARGV[0];
 
-my $dir = './';
+$nlabel = 1;
 
+my $dir = './';
 
 # gnuplot file
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
 
-printf $tgp "%s\n", "set terminal pdf enhanced fsize 10 fname 'Helvetica' linewidth 1.0 color size 11.7in,8.3in";
-printf $tgp "%s%s%s\n", "set output '", $league,"_plot.pdf'";
+#font Helvetica
+printf $tgp "%s\n", "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'";
+#printf $tgp "%s\n", "set terminal pdf enhanced fsize 10 fname 'Helvetica' linewidth 1.0 color size 11.7in,8.3in";
+printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set grid ytics";
 printf $tgp "%s\n", "set xlabel 'Spieltag'";
 printf $tgp "%s\n", "set ylabel 'Punkten'";
-
-# #set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
-
-# printf $tgp "%s\n", "set xrange [0.5:27.5]";
-# printf $tgp "%s\n", "set xtics 1";
-# printf $tgp "%s\n", "set yrange [0:60]";
-# printf $tgp "%s\n", "set ytics 52";
-
-# set key at 29,30 reverse title "g points tor+ tor- s u l"
-
-# set label 11 "WEILH 1  WEILH 2" at 0.5,-3 tc rgb 'gray' font "Helvetica,5"
-# set label 12 "WEILH 1  WEILH 2" at 0.5,-4 tc rgb 'gray' font "Helvetica,5"
-# set label 13 "WEILH 1  WEILH 2" at 0.5,-5 tc rgb 'gray' font "Helvetica,5"
-# set label 14 "WEILH 1  WEILH 2" at 0.5,-6 tc rgb 'gray' font "Helvetica,5"
-# set label 15 "WEILH 1  WEILH 2" at 0.5,-7 tc rgb 'gray' font "Helvetica,5"
-
-# set label 16 "WEILH 1  WEILH 2" at 1.5,-9 tc rgb 'gray' font "Helvetica,5"
-# set label 17 "WEILH 1  WEILH 2" at 1.5,-10 tc rgb 'gray' font "Helvetica,5"
-# set label 18 "WEILH 1  WEILH 2" at 1.5,-11 tc rgb 'gray' font "Helvetica,5"
-# set label 19 "WEILH 1  WEILH 2" at 1.5,-12 tc rgb 'gray' font "Helvetica,5"
-# set label 20 "WEILH 1  WEILH 2" at 1.5,-13 tc rgb 'gray' font "Helvetica,5"
-
-# set label 3 "WEILH" at 0.5,64.5 tc rgb 'gray' font "Helvetica,6"
-# set label 4 "WM3"   at 0.5,63.5 tc rgb 'gray' font "Helvetica,6"
-# set label 5 "WM4"   at 0.5,62.5 tc rgb 'gray' font "Helvetica,6"
-# set label 6 "WM5"   at 0.5,61.5 tc rgb 'gray' font "Helvetica,6"
-# set label 7 "WM6"   at 0.5,60.5 tc rgb 'gray' font "Helvetica,6"
-# set label 8 "WM1"   at 0.5,65.5 tc rgb 'gray' font "Helvetica,6"
-# set label 9 "WM2"   at 0.5,66.5 tc rgb 'gray' font "Helvetica,6"
-# set label 10 "WM3"  at 0.5,67.5 tc rgb 'gray' font "Helvetica,6"
-# set label 11 "WM4"  at 0.5,68.5 tc rgb 'gray' font "Helvetica,6"
-
-# set size   0.9, 0.75
-# set origin 0.0, 0.15
-
-# plot \
-# '../data/gh_dehnung.dat' u 4:6 title "WM 13 17 1-1 4 6 7" w p pt 7 ps 2
-
 
 # read games
 $rgames = $dir.$league."_date.dat";
@@ -188,17 +153,48 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
 	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
 
+	$pos_head = 105; 
 	for  $i ( 0 .. $#{ $results{names} } ) {
 	    if ( exists $idxold[$i] ) {
-		if ( $idx[$i] == $idxold[$i] ) {
+		
+		for  $j ( 0 .. @idxold - 1) {
+		    if ( $idx[$i] == $idxold[$j] ) { 
+			$icomp = $j;
+		    }
+		}
+
+		if ( $i == $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
-		} elsif ( $idx[$i] < $idxold[$i] ) {
+
+		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'gray' font 'Courier,5'\n", 
+		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    $pos_head -= 1; 
+		    $nlabel += 1;
+
+		} elsif ( $i < $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
+
+		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'green' font 'Courier,5'\n", 
+		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    $pos_head -= 1; 
+		    $nlabel += 1;
+
 		} else {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
+
+		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'red' font 'Courier,5'\n", 
+		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    $pos_head -= 1; 
+		    $nlabel += 1;
 		}
 	    } else {
 		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
+
+		printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'gray' font 'Courier,5'\n", 
+		$nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		$pos_head -= 1;
+		$nlabel += 1;
+	
 	    }
 	}
 	    
@@ -242,10 +238,26 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 @{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
 @{ $results_tmp{games} }   = @{ $results{games} }[@idx];
 
+#printf $tgp "%s\n", "set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
+printf $tgp "set xrange [0.5:%.1f]\n", $sp + 0.5;
+printf $tgp "%s\n", "set xtics 1";
+printf $tgp "%s\n", "set yrange [0:120]";
+printf $tgp "%s\n", "set ytics 5";
+printf $tgp "%s\n", "set size   0.9, 0.75";
+printf $tgp "%s\n", "set origin 0.0, 0.15";
+printf $tgp "%s\n", "set key at 29,30 reverse";
+
+printf $tgp "%s", "plot ";
 for $i ( 0 .. $#{ $results{names} } ) {
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
     $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 
     $results_tmp{won}[$i], $results_tmp{lost}[$i], $results_tmp{draw}[$i];
+
+    if ( $i == $#{ $results{names} } ) {
+	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2", $idx[$i] + 2, $results_tmp{abbrs}[$i];
+    } else {
+	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2,", $idx[$i] + 2, $results_tmp{abbrs}[$i];
+    }
 }
 
 close $of;
