@@ -18,13 +18,12 @@ my $dir = './';
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
 
-#font Helvetica
 printf $tgp "%s\n", "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'";
-#printf $tgp "%s\n", "set terminal pdf enhanced fsize 10 fname 'Helvetica' linewidth 1.0 color size 11.7in,8.3in";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set grid ytics";
 printf $tgp "%s\n", "set xlabel 'Spieltag'";
 printf $tgp "%s\n", "set ylabel 'Punkten'";
+
 
 # read games
 $rgames = $dir.$league."_date.dat";
@@ -239,12 +238,22 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 @{ $results_tmp{games} }   = @{ $results{games} }[@idx];
 
 #printf $tgp "%s\n", "set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
-printf $tgp "set xrange [0.5:%.1f]\n", $sp + 0.5;
+
+$xmax = 1.4*$sp;
+$ymax = int( 6*$#{ @results{names} }/5);
+
+if ($ymax*5 != 6*$#{ @results{names} } ){
+    $ymax += 1;
+}
+
+$ymax = 1.4 * ($ymax * 5 );
+
+printf $tgp "set xrange [0.5:%.1f]\n", $xmax;
 printf $tgp "%s\n", "set xtics 1";
-printf $tgp "%s\n", "set yrange [0:120]";
+printf $tgp "set yrange [0:%s]\n", $ymax;
 printf $tgp "%s\n", "set ytics 5";
-printf $tgp "%s\n", "set size   0.9, 0.75";
-printf $tgp "%s\n", "set origin 0.0, 0.15";
+#printf $tgp "%s\n", "set size   0.9, 0.75";
+#printf $tgp "%s\n", "set origin 0.0, 0.15";
 printf $tgp "%s\n", "set key at 29,30 reverse";
 
 printf $tgp "%s", "plot ";
