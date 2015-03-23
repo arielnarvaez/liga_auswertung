@@ -10,8 +10,6 @@ use List::Util qw(sum);
 
 $league = $ARGV[0];
 
-$nlabel = 1;
-
 my $dir = './';
 
 # gnuplot file
@@ -65,7 +63,7 @@ open($tt, '>', $outfile) or die "Could not open file $outputfile: $!";
 # create head of file table_teams.dat
 # and the hash results is defined
 printf $tt "# sp\t";
-for $i ( 0 .. $#{ @results{names} } ) {
+for $i ( 0 .. $nteams - 1 ) {
     $results{games}[$i] = 0;
     $results{won}[$i] = 0;
     $results{lost}[$i] = 0;
@@ -85,18 +83,38 @@ $sp = 0;
 foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 
     $sp += 1;
-    for $i ( 0 .. $#{ $results{names} } ) {
+    for $i ( 0 .. $nteams -1 ) {
 	$results{played}[$i] = 0;
     }
 
     open my $fh, "<", $ft or die "can't read open '$fp': $OS_ERROR";
 
+
+    if ( $sp even ) { # even
+	$pos_foot = -1;
+    } else { # odd
+	$pos_foot = -10;
+    }
+
     while ( $line = <$fh> ) {
 	@splitline = split("&", $line);
 	s{^\s+|\s+$}{}g foreach @splitline; # delete spaces before and after the text
 
-	for $i ( 0 .. $#{ $results{names} } ) {
+	for  $j ( 0 .. $nteams -1 ) {
+	    if ( $results{names}[$j] eq $splitline[1] ) { 
+		$ihome = $j;
+	    }
+	    if ( $results{names}[$j] eq $splitline[2] ) { 
+		$iguest = $j;
+	    }
+	}
 
+
+	printf $tgp "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $sp, $pos_foot; 
+	$pos_foot -= 1; 
+
+	for $i ( 0 .. $nteams - 1 ) {
 	    if ( $results{names}[$i] eq $splitline[1] ) {
 		if ( looks_like_number($splitline[3]) ) {
 		    $results{played}[$i]  = 1;
@@ -147,13 +165,13 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	# sorting bei points, then diff goals and then played games.
 	my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 			     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
-			     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} } - 1;
+			     $results{games}[$a] <=> $results{games}[$b] } 0 .. $nteams - 1;
 
 	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
 	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
 
 	$pos_head = 105; 
-	for  $i ( 0 .. $#{ $results{names} } ) {
+	for  $i ( 0 .. $nteams - 1 ) {
 	    if ( exists $idxold[$i] ) {
 		
 		for  $j ( 0 .. @idxold - 1) {
@@ -165,34 +183,28 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		if ( $i == $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'gray' font 'Courier,5'\n", 
-		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
-		    $nlabel += 1;
-
 		} elsif ( $i < $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
 
-		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'green' font 'Courier,5'\n", 
-		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'green' font 'Courier,5'\n", 
+		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
-		    $nlabel += 1;
-
 		} else {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
 
-		    printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'red' font 'Courier,5'\n", 
-		    $nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'red' font 'Courier,5'\n", 
+		     $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
-		    $nlabel += 1;
 		}
 	    } else {
 		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		printf $tgp "set label %s '%s' at %.1f, %.1f tc rgb 'gray' font 'Courier,5'\n", 
-		$nlabel, $results_tmp{abbrs}[$i], $sp-0.5, $pos_head; 
+		printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+		$results_tmp{abbrs}[$i], $sp, $pos_head; 
 		$pos_head -= 1;
-		$nlabel += 1;
 	
 	    }
 	}
@@ -200,7 +212,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	@idxold = @idx;
 
 	printf $tt "   $sp\t";
-	for $i (  0 .. $#{ $results{names} } ) {
+	for $i (  0 .. $nteams - 1 ) {
 	    if ( $results{played}[$i] == 1 ) {
 		printf $tt "\t\t%s", $results{points}[$i];
 	    } else {
@@ -224,7 +236,7 @@ open($of, '>', $outfile) or die "Could not open file $outputfile: $!";
 # sorting bei points, then diff goals and then played games.
 my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 		     -$results{gdiff}[$a] <=> -$results{gdiff}[$b] ||
-		     $results{games}[$a] <=> $results{games}[$b] } 0 .. @{ $results{names} } - 1;
+		     $results{games}[$a] <=> $results{games}[$b] } 0 .. $nteams - 1;
 
 @{ $results_tmp{names} }   = @{ $results{names} }[@idx];
 @{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
@@ -240,9 +252,9 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 #printf $tgp "%s\n", "set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
 
 $xmax = 1.4*$sp;
-$ymax = int( 6*$#{ @results{names} }/5);
+$ymax = int( 6*($nteams - 1)/5);
 
-if ($ymax*5 != 6*$#{ @results{names} } ){
+if ($ymax*5 != 6*($nteams - 1) ){
     $ymax += 1;
 }
 
@@ -257,12 +269,12 @@ printf $tgp "%s\n", "set ytics 5";
 printf $tgp "%s\n", "set key at 29,30 reverse";
 
 printf $tgp "%s", "plot ";
-for $i ( 0 .. $#{ $results{names} } ) {
+for $i ( 0 .. $nteams -1 ) {
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
     $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 
     $results_tmp{won}[$i], $results_tmp{lost}[$i], $results_tmp{draw}[$i];
 
-    if ( $i == $#{ $results{names} } ) {
+    if ( $i == $nteams -1 ) {
 	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2", $idx[$i] + 2, $results_tmp{abbrs}[$i];
     } else {
 	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2,", $idx[$i] + 2, $results_tmp{abbrs}[$i];
