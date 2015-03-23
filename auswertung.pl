@@ -89,11 +89,12 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 
     open my $fh, "<", $ft or die "can't read open '$fp': $OS_ERROR";
 
-
-    if ( $sp even ) { # even
-	$pos_foot = -1;
-    } else { # odd
+    if (  $sp - 3*int($sp/3) == 1 ) { 
+	$pos_foot = -20;
+    } elsif ( $sp - 3*int($sp/3) == 2 ) {
 	$pos_foot = -10;
+    } else {
+	$pos_foot = -1;
     }
 
     while ( $line = <$fh> ) {
@@ -109,8 +110,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    }
 	}
 
-
-	printf $tgp "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+	printf $tgp "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,4'\n", 
 	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $sp, $pos_foot; 
 	$pos_foot -= 1; 
 
@@ -170,7 +170,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
 	@{ $results_tmp{points} }  = @{ $results{points} }[@idx];
 
-	$pos_head = 105; 
+	$pos_head = 85; 
 	for  $i ( 0 .. $nteams - 1 ) {
 	    if ( exists $idxold[$i] ) {
 		
@@ -251,18 +251,18 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 
 #printf $tgp "%s\n", "set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
 
-$xmax = 1.4*$sp;
+$xmax = 1.2*$sp;
 $ymax = int( 6*($nteams - 1)/5);
 
 if ($ymax*5 != 6*($nteams - 1) ){
     $ymax += 1;
 }
 
-$ymax = 1.4 * ($ymax * 5 );
+$ymax = 1.2 * ($ymax * 5 );
 
-printf $tgp "set xrange [0.5:%.1f]\n", $xmax;
+printf $tgp "set xrange [-5:%.1f]\n", $xmax;
 printf $tgp "%s\n", "set xtics 1";
-printf $tgp "set yrange [0:%s]\n", $ymax;
+printf $tgp "set yrange [-30:%s]\n", $ymax;
 printf $tgp "%s\n", "set ytics 5";
 #printf $tgp "%s\n", "set size   0.9, 0.75";
 #printf $tgp "%s\n", "set origin 0.0, 0.15";
