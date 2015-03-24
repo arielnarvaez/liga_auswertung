@@ -28,6 +28,9 @@ open($tgp_3, '>', $outfile_plot_3) or die "Could not open file $outputfile: $!";
 $outfile_plot_4 = $dir.$league."_plot_4.gp";
 open($tgp_4, '>', $outfile_plot_4) or die "Could not open file $outputfile: $!";	
 
+$outfile_plot_5 = $dir.$league."_plot_5.gp";
+open($tgp_5, '>', $outfile_plot_5) or die "Could not open file $outputfile: $!";	
+
 
 printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'\n";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
@@ -39,50 +42,66 @@ printf $tgp_1 "set origin 0.0, 0.8\n";
 printf $tgp_1 "set lmargin 10\n";
 printf $tgp_1 "unset grid\n";
 printf $tgp_1 "set border 15\n";
-printf $tgp_1 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_1 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
 printf $tgp_1 "set yrange [0:20]\n";
 printf $tgp_1 "unset xlabel\n";
 printf $tgp_1 "unset ylabel\n";
 printf $tgp_1 "unset xtics\n";
 printf $tgp_1 "unset ytics\n";
+printf $tgp_1 "set tics scale 0\n";
 
 printf $tgp_2 "set size   0.7, 0.2\n";
 printf $tgp_2 "set origin 0.0, 0.6\n";
 printf $tgp_2 "set lmargin 10\n";
-printf $tgp_2 "set grid\n";  # only y
+printf $tgp_2 "set grid ytics\n";
 printf $tgp_2 "set border 15\n";
 printf $tgp_2 "set xrange [0.5:%.0f]\n", $ngames; #########
-printf $tgp_2 "set yrange [0:20]\n"; ## auto
+printf $tgp_2 "set yrange [0:10 < * < 200]\n"; 
 printf $tgp_2 "unset xlabel\n";
 printf $tgp_2 "set ylabe 'Tor'l\n";
 printf $tgp_2 "set xtics 1\n";
-printf $tgp_2 "unset ytics\n"; ## auto
+printf $tgp_2 "set yrange [0:0 < * < 100]\n"; ## auto
+printf $tgp_2 "set tics scale 0\n";
 
 printf $tgp_3 "set size   0.7, 0.4\n";
 printf $tgp_3 "set origin 0.0, 0.2\n";
 printf $tgp_3 "set lmargin 10\n";
-printf $tgp_3 "set grid\n";  # only y
+printf $tgp_3 "set grid ytics\n";
 printf $tgp_3 "set border 15\n";
-printf $tgp_3 "set xrange [0.5:%.0f]\n", $ngames; #########
-printf $tgp_3 "set yrange [0:20]\n"; ## auto
+printf $tgp_3 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
+printf $tgp_2 "set yrange [0:10 < * < 200]\n"; 
 printf $tgp_3 "set xlabel 'Spieltag'\n";
 printf $tgp_3 "set ylabe 'Tor'l\n";
 printf $tgp_3 "set xtics 1\n";
-printf $tgp_3 "unset ytics\n"; ## auto
-## xtics format
-## ytics format
+printf $tgp_3 "set xtics 5\n";
+printf $tgp_3 "set format x '%.0f'\n";
+printf $tgp_3 "set format y '%.0f'\n";
+printf $tgp_3 "set tics scale 1\n";
 
 printf $tgp_4 "set size   0.7, 0.2\n";
 printf $tgp_4 "set origin 0.0, 0.0\n";
 printf $tgp_4 "set lmargin 10\n";
 printf $tgp_4 "unset grid\n";
 printf $tgp_4 "set border 15\n";
-printf $tgp_4 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_4 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
 printf $tgp_4 "set yrange [0:20]\n";
 printf $tgp_4 "unset xlabel\n";
 printf $tgp_4 "unset ylabel\n";
 printf $tgp_4 "unset xtics\n";
 printf $tgp_4 "unset ytics\n";
+
+printf $tgp_5 "set size   0.25, 1.0\n";
+printf $tgp_5 "set origin 0.75, 0.0\n";
+printf $tgp_5 "set lmargin 10\n";
+printf $tgp_5 "unset grid\n";
+printf $tgp_5 "set border 0\n";
+printf $tgp_5 "set xrange [0:20]\n";
+printf $tgp_5 "set yrange [0:100]\n";
+printf $tgp_5 "unset xlabel\n";
+printf $tgp_5 "unset ylabel\n";
+printf $tgp_5 "unset xtics\n";
+printf $tgp_5 "unset ytics\n";
+printf $tgp_5 "set tics scale 0\n";
 
 
 # read games
@@ -186,7 +205,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    }
 	}
 
-	printf $tgp "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,4'\n", 
+	printf $tgp_4 "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,4'\n", 
 	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $sp, $pos_foot; 
 	$pos_foot -= 1; 
 
@@ -251,26 +270,26 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		if ( $i == $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+		    printf $tgp_1 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
 		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		} elsif ( $i < $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
 
-		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'green' font 'Courier,5'\n", 
+		    printf $tgp_1 "set label '%s' at %.1f, %.1f center tc rgb 'green' font 'Courier,5'\n", 
 		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		} else {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
 
-		    printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'red' font 'Courier,5'\n", 
+		    printf $tgp_1 "set label '%s' at %.1f, %.1f center tc rgb 'red' font 'Courier,5'\n", 
 		     $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		}
 	    } else {
 		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		printf $tgp "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
+		printf $tgp_1 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,5'\n", 
 		$results_tmp{abbrs}[$i], $sp, $pos_head; 
 		$pos_head -= 1;
 	
@@ -335,22 +354,16 @@ if ($ymax*5 != 6*($nteams - 1) ){
 
 $ymax = 1.2 * ($ymax * 5 );
 
-printf $tgp "set xrange [-5:%.1f]\n", $xmax;
-printf $tgp "%s\n", "set xtics 1";
-printf $tgp "set yrange [-30:%s]\n", $ymax;
-printf $tgp "%s\n", "set ytics 5";
-printf $tgp "%s\n", "set key at 29,30 reverse";
-
-printf $tgp "%s", "plot ";
+printf $tgp_3 "%s", "plot ";
 for $i ( 0 .. $nteams -1 ) {
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
     $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 
     $results_tmp{won}[$i], $results_tmp{lost}[$i], $results_tmp{draw}[$i];
 
     if ( $i == $nteams -1 ) {
-	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2", $idx[$i] + 2, $results_tmp{abbrs}[$i];
+	printf $tgp_3 "'table_points.dat' u 1:%.0f title '%s' w lp pt 7 ps 2", $idx[$i] + 2, $results_tmp{abbrs}[$i];
     } else {
-	printf $tgp "'table_teams.dat' u 1:%.0f title '%s' w lp pt 7 ps 2,", $idx[$i] + 2, $results_tmp{abbrs}[$i];
+	printf $tgp_3 "'table_points.dat' u 1:%.0f title '%s' w lp pt 7 ps 2,", $idx[$i] + 2, $results_tmp{abbrs}[$i];
     }
 }
 
