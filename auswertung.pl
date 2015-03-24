@@ -16,17 +16,73 @@ my $dir = './';
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
 
+$outfile_plot_1 = $dir.$league."_plot_1.gp";
+open($tgp_1, '>', $outfile_plot_1) or die "Could not open file $outputfile: $!";	
+
+$outfile_plot_2 = $dir.$league."_plot_2.gp";
+open($tgp_2, '>', $outfile_plot_2) or die "Could not open file $outputfile: $!";	
+
+$outfile_plot_3 = $dir.$league."_plot_3.gp";
+open($tgp_3, '>', $outfile_plot_3) or die "Could not open file $outputfile: $!";	
+
+$outfile_plot_4 = $dir.$league."_plot_4.gp";
+open($tgp_4, '>', $outfile_plot_4) or die "Could not open file $outputfile: $!";	
+
+
 printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'\n";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
+printf $tgp "%s\n", "set multiplot";
 
-#printf $tgp "%s\n", "set multiplot";
 
-#printf $tgp "%s\n", "set size   1.0, 0.20";
-#printf $tgp "%s\n", "set origin 0.0, 0.00";
+printf $tgp_1 "set size   0.7, 0.2\n";
+printf $tgp_1 "set origin 0.0, 0.8\n";
+printf $tgp_1 "set lmargin 10\n";
+printf $tgp_1 "unset grid\n";
+printf $tgp_1 "set border 15\n";
+printf $tgp_1 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_1 "set yrange [0:20]\n";
+printf $tgp_1 "unset xlabel\n";
+printf $tgp_1 "unset ylabel\n";
+printf $tgp_1 "unset xtics\n";
+printf $tgp_1 "unset ytics\n";
 
-printf $tgp "set grid ytics";
-printf $tgp "set xlabel 'Spieltag'\n";
-printf $tgp "set ylabel 'Punkten'\n";
+printf $tgp_2 "set size   0.7, 0.2\n";
+printf $tgp_2 "set origin 0.0, 0.6\n";
+printf $tgp_2 "set lmargin 10\n";
+printf $tgp_2 "set grid\n";  # only y
+printf $tgp_2 "set border 15\n";
+printf $tgp_2 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_2 "set yrange [0:20]\n"; ## auto
+printf $tgp_2 "unset xlabel\n";
+printf $tgp_2 "set ylabe 'Tor'l\n";
+printf $tgp_2 "set xtics 1\n";
+printf $tgp_2 "unset ytics\n"; ## auto
+
+printf $tgp_3 "set size   0.7, 0.4\n";
+printf $tgp_3 "set origin 0.0, 0.2\n";
+printf $tgp_3 "set lmargin 10\n";
+printf $tgp_3 "set grid\n";  # only y
+printf $tgp_3 "set border 15\n";
+printf $tgp_3 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_3 "set yrange [0:20]\n"; ## auto
+printf $tgp_3 "set xlabel 'Spieltag'\n";
+printf $tgp_3 "set ylabe 'Tor'l\n";
+printf $tgp_3 "set xtics 1\n";
+printf $tgp_3 "unset ytics\n"; ## auto
+## xtics format
+## ytics format
+
+printf $tgp_4 "set size   0.7, 0.2\n";
+printf $tgp_4 "set origin 0.0, 0.0\n";
+printf $tgp_4 "set lmargin 10\n";
+printf $tgp_4 "unset grid\n";
+printf $tgp_4 "set border 15\n";
+printf $tgp_4 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_4 "set yrange [0:20]\n";
+printf $tgp_4 "unset xlabel\n";
+printf $tgp_4 "unset ylabel\n";
+printf $tgp_4 "unset xtics\n";
+printf $tgp_4 "unset ytics\n";
 
 
 # read games
@@ -66,7 +122,9 @@ s{^\s+|\s+$}{}g foreach @{ $results{abbrs} };
 $outfile_points = $dir."table_teams_points.dat";
 open($tt_points, '>', $outfile_points) or die "Could not open file $outputfile: $!";	
 
-# this file contains the data to be plotted
+$outfile_hpoints = $dir."table_teams_hpoints.dat";
+open($tt_hpoints, '>', $outfile_hpoints) or die "Could not open file $outputfile: $!";	
+
 $outfile_gfavor = $dir."table_teams_gfavor.dat";
 open($tt_gfavor, '>', $outfile_gfavor) or die "Could not open file $outputfile: $!";	
 
@@ -74,28 +132,34 @@ open($tt_gfavor, '>', $outfile_gfavor) or die "Could not open file $outputfile: 
 # create head of file table_teams.dat
 # and the hash results is defined
 printf $tt_points "# sp\t";
+printf $tt_hpoints "# sp\t";
+printf $tt_gfavor "# sp\t";
+
 for $i ( 0 .. $nteams - 1 ) {
-    $results{games}[$i] = 0;
-    $results{won}[$i] = 0;
-    $results{lost}[$i] = 0;
-    $results{draw}[$i] = 0;
-    $results{gfavor}[$i] = 0;
+    $results{games}[$i]   = 0;
+    $results{won}[$i]     = 0;
+    $results{lost}[$i]    = 0;
+    $results{draw}[$i]    = 0;
+    $results{gfavor}[$i]  = 0;
     $results{gcontra}[$i] = 0;
     $results{gcontra}[$i] = 0;
-    $results{gdiff}[$i] = 0;
-    $results{points}[$i] = 0;
+    $results{gdiff}[$i]   = 0;
+    $results{points}[$i]  = 0;
+    $results{hpoints}[$i] = 0;   # points collected at home
 
     printf $tt_points "\t%s", $results{abbrs}[$i];
+    printf $tt_hpoints "\t%s", $results{abbrs}[$i];
     printf $tt_gfavor "\t%s", $results{abbrs}[$i];
 }
 printf $tt_points "\n";
+printf $tt_hpoints "\n";
 printf $tt_gfavor "\n";
 
 $sp = 0;
 foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 
     $sp += 1;
-    for $i ( 0 .. $nteams -1 ) {
+    for $i ( 0 .. $nteams - 1 ) {
 	$results{played}[$i] = 0;
     }
 
@@ -126,45 +190,37 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $sp, $pos_foot; 
 	$pos_foot -= 1; 
 
-	for $i ( 0 .. $nteams - 1 ) {
-	    if ( $results{names}[$i] eq $splitline[1] ) {
-		if ( looks_like_number($splitline[3]) ) {
-		    $results{played}[$i]  = 1;
-		    $results{games}[$i]   += 1;                             
-		    $results{gfavor}[$i]  += $splitline[3];                
-		    $results{gcontra}[$i] += $splitline[4];               
-		    $results{gdiff}[$i]   += $splitline[3] - $splitline[4]; 
-		    if ( $splitline[3] > $splitline[4] ) {      # victory
-			$results{won}[$i]    += 1;
-			$results{points}[$i] += 3;
-		    } elsif ( $splitline[3] < $splitline[4] ) { # defeat
-			$results{lost}[$i] += 1; 
-			$results{points}[$i]  += 0;
-		    } else {                                    # draw
-			$results{draw}[$i] += 1; 
-			$results{points}[$i]  += 1;
-		    }
-		}
-	    }
+	if ( looks_like_number($splitline[3]) ) {
+	    $results{played}[$ihome]    = 1;
+	    $results{games}[$ihome]    += 1;
+	    $results{gfavor}[$ihome]   += $splitline[3];
+	    $results{gcontra}[$ihome]  += $splitline[4];
+	    $results{gdiff}[$ihome]    += $splitline[3] - $splitline[4];
 
-	    if ( $results{names}[$i] eq $splitline[2] ) {
-		if ( looks_like_number($splitline[3]) ) {
-		    $results{played}[$i]  = 1;
-		    $results{games}[$i]   += 1;  
-		    $results{gfavor}[$i]  += $splitline[4];                
-		    $results{gcontra}[$i] += $splitline[3];                
-		    $results{gdiff}[$i]   += $splitline[4] - $splitline[3];
-		    if ( $splitline[3] > $splitline[4] ) {      # defeat
-			$results{lost}[$i]   += 1; 
-			$results{points}[$i] += 0;
-		    } elsif ( $splitline[3] < $splitline[4] ) { # victory
-			$results{won}[$i]    += 1;
-			$results{points}[$i] += 3; 
-		    } else {                                    # draw
-			$results{draw}[$i]   += 1; 
-			$results{points}[$i] += 1;
-		    }
-		}
+	    $results{played}[$iguest]   = 1;
+	    $results{games}[$iguest]   += 1;
+	    $results{gfavor}[$iguest]  += $splitline[4];
+	    $results{gcontra}[$iguest] += $splitline[3];
+	    $results{gdiff}[$iguest]   += $splitline[4] - $splitline[3];
+
+	    if ( $splitline[3] > $splitline[4] ) {      # home victory
+		$results{won}[$ihome]      += 1;
+		$results{points}[$ihome]   += 3;
+		$results{hpoints}[$ihome]  += 3;
+
+		$results{lost}[$iguest]    += 1;
+	    } elsif ( $splitline[3] < $splitline[4] ) { # home defeat
+		$results{lost}[$ihome]     += 1; 
+
+		$results{won}[$iguest]     += 1;
+		$results{points}[$iguest]  += 3;
+	    } else {                                    # draw
+		$results{draw}[$ihome]     += 1; 
+		$results{points}[$ihome]   += 1;
+		$results{hpoints}[$ihome]  += 1;
+
+		$results{draw}[$iguest]    += 1; 
+		$results{points}[$iguest]  += 1;
 	    }
 	}
     }
@@ -224,17 +280,21 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	@idxold = @idx;
 
 	printf $tt_points "  %.0f\t", $sp;
+	printf $tt_hpoints "  %.0f\t", $sp;
 	printf $tt_gfavor "   %.0f\t", $sp ;
 	for $i (  0 .. $nteams - 1 ) {
 	    if ( $results{played}[$i] == 1 ) {
 		printf $tt_points "\t\t%s", $results{points}[$i];
+		printf $tt_hpoints "\t\t%s", $results{hpoints}[$i];
 		printf $tt_gfavor "\t\t%s", $results{gfavor}[$i];
 	    } else {
 		printf $tt_points "\t\t&";
+		printf $tt_hpoints "\t\t&";
 		printf $tt_gfavor "\t\t&";
 	    }
 	}
 	printf $tt_points "\n";
+	printf $tt_hpoints "\n";
 	printf $tt_gfavor "\n";
 
     } else {
