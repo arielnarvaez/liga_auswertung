@@ -16,11 +16,17 @@ my $dir = './';
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
 
-printf $tgp "%s\n", "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'";
+printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'\n";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
-printf $tgp "%s\n", "set grid ytics";
-printf $tgp "%s\n", "set xlabel 'Spieltag'";
-printf $tgp "%s\n", "set ylabel 'Punkten'";
+
+#printf $tgp "%s\n", "set multiplot";
+
+#printf $tgp "%s\n", "set size   1.0, 0.20";
+#printf $tgp "%s\n", "set origin 0.0, 0.00";
+
+printf $tgp "set grid ytics";
+printf $tgp "set xlabel 'Spieltag'\n";
+printf $tgp "set ylabel 'Punkten'\n";
 
 
 # read games
@@ -57,12 +63,17 @@ s{^\s+|\s+$}{}g foreach @{ $results{names} };
 s{^\s+|\s+$}{}g foreach @{ $results{abbrs} };
 
 # this file contains the data to be plotted
-$outfile = $dir."table_teams.dat";
-open($tt, '>', $outfile) or die "Could not open file $outputfile: $!";	
+$outfile_points = $dir."table_teams_points.dat";
+open($tt_points, '>', $outfile_points) or die "Could not open file $outputfile: $!";	
+
+# this file contains the data to be plotted
+$outfile_gfavor = $dir."table_teams_gfavor.dat";
+open($tt_gfavor, '>', $outfile_gfavor) or die "Could not open file $outputfile: $!";	
+
 
 # create head of file table_teams.dat
 # and the hash results is defined
-printf $tt "# sp\t";
+printf $tt_points "# sp\t";
 for $i ( 0 .. $nteams - 1 ) {
     $results{games}[$i] = 0;
     $results{won}[$i] = 0;
@@ -74,10 +85,11 @@ for $i ( 0 .. $nteams - 1 ) {
     $results{gdiff}[$i] = 0;
     $results{points}[$i] = 0;
 
-    printf $tt "\t%s", $results{abbrs}[$i];
+    printf $tt_points "\t%s", $results{abbrs}[$i];
+    printf $tt_gfavor "\t%s", $results{abbrs}[$i];
 }
-printf $tt "\n";
-
+printf $tt_points "\n";
+printf $tt_gfavor "\n";
 
 $sp = 0;
 foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
@@ -211,16 +223,19 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    
 	@idxold = @idx;
 
-	printf $tt "   $sp\t";
+	printf $tt_points "  %.0f\t", $sp;
+	printf $tt_gfavor "   %.0f\t", $sp ;
 	for $i (  0 .. $nteams - 1 ) {
 	    if ( $results{played}[$i] == 1 ) {
-		printf $tt "\t\t%s", $results{points}[$i];
+		printf $tt_points "\t\t%s", $results{points}[$i];
+		printf $tt_gfavor "\t\t%s", $results{gfavor}[$i];
 	    } else {
-		printf $tt "\t\t%s", "&";
+		printf $tt_points "\t\t&";
+		printf $tt_gfavor "\t\t&";
 	    }
 	}
-	printf $tt "\n";
-
+	printf $tt_points "\n";
+	printf $tt_gfavor "\n";
 
     } else {
 	printf $of "\n";
@@ -264,8 +279,6 @@ printf $tgp "set xrange [-5:%.1f]\n", $xmax;
 printf $tgp "%s\n", "set xtics 1";
 printf $tgp "set yrange [-30:%s]\n", $ymax;
 printf $tgp "%s\n", "set ytics 5";
-#printf $tgp "%s\n", "set size   0.9, 0.75";
-#printf $tgp "%s\n", "set origin 0.0, 0.15";
 printf $tgp "%s\n", "set key at 29,30 reverse";
 
 printf $tgp "%s", "plot ";
