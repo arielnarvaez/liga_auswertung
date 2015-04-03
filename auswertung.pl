@@ -12,6 +12,19 @@ $league = $ARGV[0];
 
 my $dir = './';
 
+# read games
+$rgames = $dir.$league."_date.dat";
+open my $fh, "<", $rgames or die "can't read open '$fp': $OS_ERROR";
+$ngames = 0;
+
+# read the dates and save them in the array calendar 
+while ( $line = <$fh> ) {
+    @splitline = split("&", $line);
+    $ngames += 1;
+    push( @calendar, @splitline[1] );
+}
+close $fh or die "can't read close '$fp': $OS_ERROR";
+
 # gnuplot file
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
@@ -42,7 +55,7 @@ printf $tgp_1 "set origin 0.0, 0.8\n";
 printf $tgp_1 "set lmargin 10\n";
 printf $tgp_1 "unset grid\n";
 printf $tgp_1 "set border 15\n";
-printf $tgp_1 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
+printf $tgp_1 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_1 "set yrange [0:20]\n";
 printf $tgp_1 "unset xlabel\n";
 printf $tgp_1 "unset ylabel\n";
@@ -55,7 +68,7 @@ printf $tgp_2 "set origin 0.0, 0.6\n";
 printf $tgp_2 "set lmargin 10\n";
 printf $tgp_2 "set grid ytics\n";
 printf $tgp_2 "set border 15\n";
-printf $tgp_2 "set xrange [0.5:%.0f]\n", $ngames; #########
+printf $tgp_2 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_2 "set yrange [0:10 < * < 200]\n"; 
 printf $tgp_2 "unset xlabel\n";
 printf $tgp_2 "set ylabe 'Tor'l\n";
@@ -68,7 +81,7 @@ printf $tgp_3 "set origin 0.0, 0.2\n";
 printf $tgp_3 "set lmargin 10\n";
 printf $tgp_3 "set grid ytics\n";
 printf $tgp_3 "set border 15\n";
-printf $tgp_3 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
+printf $tgp_3 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_2 "set yrange [0:10 < * < 200]\n"; 
 printf $tgp_3 "set xlabel 'Spieltag'\n";
 printf $tgp_3 "set ylabe 'Tor'l\n";
@@ -83,7 +96,7 @@ printf $tgp_4 "set origin 0.0, 0.0\n";
 printf $tgp_4 "set lmargin 10\n";
 printf $tgp_4 "unset grid\n";
 printf $tgp_4 "set border 15\n";
-printf $tgp_4 "set xrange [0.5:%.0f+0.5]\n", $ngames; #########
+printf $tgp_4 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_4 "set yrange [0:20]\n";
 printf $tgp_4 "unset xlabel\n";
 printf $tgp_4 "unset ylabel\n";
@@ -102,20 +115,6 @@ printf $tgp_5 "unset ylabel\n";
 printf $tgp_5 "unset xtics\n";
 printf $tgp_5 "unset ytics\n";
 printf $tgp_5 "set tics scale 0\n";
-
-
-# read games
-$rgames = $dir.$league."_date.dat";
-open my $fh, "<", $rgames or die "can't read open '$fp': $OS_ERROR";
-$ngames = 0;
-
-# read the dates and save them in the array calendar 
-while ( $line = <$fh> ) {
-    @splitline = split("&", $line);
-    $ngames += 1;
-    push( @calendar, @splitline[1] );
-}
-close $fh or die "can't read close '$fp': $OS_ERROR";
 
 
 # read teams
