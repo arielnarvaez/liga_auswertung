@@ -28,21 +28,27 @@ while ( $line = <$fh> ) {
 close $fh or die "can't read close '$fp': $OS_ERROR";
 
 # gnuplot file
+# main plot
 $outfile_plot = $dir.$league."_plot.gp";
 open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";	
 
+# top ranking
 $outfile_plot_1 = $dir.$league."_plot_1.gp";
 open($tgp_1, '>', $outfile_plot_1) or die "Could not open file $outputfile: $!";	
 
+# goals and points (bar diagram)
 $outfile_plot_2 = $dir.$league."_plot_2.gp";
 open($tgp_2, '>', $outfile_plot_2) or die "Could not open file $outputfile: $!";	
 
+# points evolution
 $outfile_plot_3 = $dir.$league."_plot_3.gp";
 open($tgp_3, '>', $outfile_plot_3) or die "Could not open file $outputfile: $!";	
 
+# games
 $outfile_plot_4 = $dir.$league."_plot_4.gp";
 open($tgp_4, '>', $outfile_plot_4) or die "Could not open file $outputfile: $!";	
 
+# table
 $outfile_plot_5 = $dir.$league."_plot_5.gp";
 open($tgp_5, '>', $outfile_plot_5) or die "Could not open file $outputfile: $!";	
 
@@ -157,18 +163,32 @@ s{^\s+|\s+$}{}g foreach @{ $results{abbrs} };
 $outfile_points = $dir."table_teams_points.dat";
 open($tt_points, '>', $outfile_points) or die "Could not open file $outputfile: $!";	
 
-$outfile_hpoints = $dir."table_teams_hpoints.dat";
-open($tt_hpoints, '>', $outfile_hpoints) or die "Could not open file $outputfile: $!";	
+# points home
+$outfile_pts_h = $dir.$league."_pts_h.dat";
+open($tt_ph, '>', $outfile_pts_h) or die "Could not open file $outputfile: $!";	
 
-$outfile_gfavor = $dir."table_teams_gfavor.dat";
-open($tt_gfavor, '>', $outfile_gfavor) or die "Could not open file $outputfile: $!";	
+# points away
+$outfile_pts_a = $dir.$league."_pts_a.dat";
+open($tt_pa, '>', $outfile_pts_a) or die "Could not open file $outputfile: $!";	
+
+# goals home
+$outfile_goals_h = $dir.$league."_goals_h.dat";
+open($tt_gh, '>', $outfile_goals_h) or die "Could not open file $outputfile: $!";	
+
+# goals away
+$outfile_goals_a = $dir.$league."_goals_a.dat";
+open($tt_ga, '>', $outfile_goals_a) or die "Could not open file $outputfile: $!";	
+
 
 
 # create head of file table_teams.dat
 # and the hash results is defined
 printf $tt_points "# sp\t";
-printf $tt_hpoints "# sp\t";
-printf $tt_gfavor "# sp\t";
+printf $tt_ph "#";
+printf $tt_pa "#";
+printf $tt_gh "#";
+printf $tt_ga "#";
+
 
 for $i ( 0 .. $nteams - 1 ) {
     $results{games}[$i]   = 0;
@@ -177,18 +197,24 @@ for $i ( 0 .. $nteams - 1 ) {
     $results{draw}[$i]    = 0;
     $results{gfavor}[$i]  = 0;
     $results{gcontra}[$i] = 0;
-    $results{gcontra}[$i] = 0;
     $results{gdiff}[$i]   = 0;
     $results{points}[$i]  = 0;
     $results{hpoints}[$i] = 0;   # points collected at home
+    $results{apoints}[$i] = 0;   # points collected away
+    $results{hgoals}[$i] = 0;    # goals at home
+    $results{agoals}[$i] = 0;    # goals away
 
     printf $tt_points "\t%s", $results{abbrs}[$i];
-    printf $tt_hpoints "\t%s", $results{abbrs}[$i];
-    printf $tt_gfavor "\t%s", $results{abbrs}[$i];
+    printf $tt_ph "\t%s", $results{abbrs}[$i];
+    printf $tt_pa "\t%s", $results{abbrs}[$i];
+    printf $tt_gh "\t%s", $results{abbrs}[$i];
+    printf $tt_ga "\t%s", $results{abbrs}[$i];
 }
 printf $tt_points "\n";
-printf $tt_hpoints "\n";
-printf $tt_gfavor "\n";
+printf $tt_ph "\n";
+printf $tt_pa "\n";
+printf $tt_gh "\n";
+printf $tt_ga "\n";
 
 $sp = 0;
 foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
@@ -226,36 +252,38 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	$pos_foot -= 1; 
 
 	if ( looks_like_number($splitline[3]) ) {
-	    $results{played}[$ihome]    = 1;
-	    $results{games}[$ihome]    += 1;
-	    $results{gfavor}[$ihome]   += $splitline[3];
-	    $results{gcontra}[$ihome]  += $splitline[4];
-	    $results{gdiff}[$ihome]    += $splitline[3] - $splitline[4];
+	    $results{played}[$ihome]    = 1; # boolean
+	    $results{games}[$ihome]     += 1;
+	    $results{gfavor}[$ihome]    += $splitline[3];
+	    $results{gcontra}[$ihome]   += $splitline[4];
+	    $results{gdiff}[$ihome]     += $splitline[3] - $splitline[4];
+	    $results{hgoals}[$ihome]    += $splitline[3];
 
-	    $results{played}[$iguest]   = 1;
-	    $results{games}[$iguest]   += 1;
-	    $results{gfavor}[$iguest]  += $splitline[4];
-	    $results{gcontra}[$iguest] += $splitline[3];
-	    $results{gdiff}[$iguest]   += $splitline[4] - $splitline[3];
+	    $results{played}[$iguest]   = 1; # boolean
+	    $results{games}[$iguest]    += 1;
+	    $results{gfavor}[$iguest]   += $splitline[4];
+	    $results{gcontra}[$iguest]  += $splitline[3];
+	    $results{gdiff}[$iguest]    += $splitline[4] - $splitline[3];
+	    $results{agoals}[$iguest]   += $splitline[4];
+
 
 	    if ( $splitline[3] > $splitline[4] ) {      # home victory
 		$results{won}[$ihome]      += 1;
+		$results{lost}[$iguest]    += 1;
 		$results{points}[$ihome]   += 3;
 		$results{hpoints}[$ihome]  += 3;
-
-		$results{lost}[$iguest]    += 1;
 	    } elsif ( $splitline[3] < $splitline[4] ) { # home defeat
-		$results{lost}[$ihome]     += 1; 
-
-		$results{won}[$iguest]     += 1;
-		$results{points}[$iguest]  += 3;
+		$results{lost}[$ihome]      += 1; 
+		$results{won}[$iguest]      += 1;
+		$results{points}[$iguest]   += 3;
+		$results{apoints}[$iguest]  += 3;
 	    } else {                                    # draw
-		$results{draw}[$ihome]     += 1; 
-		$results{points}[$ihome]   += 1;
-		$results{hpoints}[$ihome]  += 1;
-
-		$results{draw}[$iguest]    += 1; 
-		$results{points}[$iguest]  += 1;
+		$results{draw}[$ihome]      += 1; 
+		$results{points}[$ihome]    += 1;
+		$results{draw}[$iguest]     += 1; 
+		$results{points}[$iguest]   += 1;
+		$results{hpoints}[$ihome]   += 1;
+		$results{apoints}[$iguest]  += 1;
 	    }
 	}
     }
@@ -315,22 +343,14 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	@idxold = @idx;
 
 	printf $tt_points "  %.0f\t", $sp;
-	printf $tt_hpoints "  %.0f\t", $sp;
-	printf $tt_gfavor "   %.0f\t", $sp ;
 	for $i (  0 .. $nteams - 1 ) {
 	    if ( $results{played}[$i] == 1 ) {
 		printf $tt_points "\t\t%s", $results{points}[$i];
-		printf $tt_hpoints "\t\t%s", $results{hpoints}[$i];
-		printf $tt_gfavor "\t\t%s", $results{gfavor}[$i];
 	    } else {
 		printf $tt_points "\t\t&";
-		printf $tt_hpoints "\t\t&";
-		printf $tt_gfavor "\t\t&";
 	    }
 	}
 	printf $tt_points "\n";
-	printf $tt_hpoints "\n";
-	printf $tt_gfavor "\n";
 
     } else {
 	printf $of "\n";
@@ -341,7 +361,6 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 
 printf $tgp_1 "plot 'empty.dat' notitle\n";
 printf $tgp_4 "plot 'empty.dat' notitle\n";
-
 
 $outfile = $dir."final_table.dat";
 open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
@@ -362,7 +381,6 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 @{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
 @{ $results_tmp{games} }   = @{ $results{games} }[@idx];
 
-#printf $tgp "%s\n", "set title 'B Klasse Zugspitze 4' font "Helvetica,16" tc rgb "red" tgpfset 0,3
 
 $xmax = 1.2*$sp;
 $ymax = int( 6*($nteams - 1)/5);
@@ -375,10 +393,16 @@ $ymax = 1.2 * ($ymax * 5 );
 
 printf $tgp_2 "%s", "plot ";
 printf $tgp_3 "%s", "plot ";
+
 for $i ( 0 .. $nteams -1 ) {
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
     $results_tmp{points}[$i], $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 
     $results_tmp{won}[$i], $results_tmp{lost}[$i], $results_tmp{draw}[$i];
+
+    printf $tt_ph "\t%.0f\t", $results{hpoints}[$i];
+    printf $tt_pa "\t%.0f\t", $results{apoints}[$i];
+    printf $tt_gh "\t%.0f\t", $results{hgoals}[$i];
+    printf $tt_ga "\t%.0f\t", $results{agoals}[$i];
 
     if ( $i == $nteams -1 ) {
 	printf $tgp_2 "'table_teams_gfavor.dat' u 1:%.0f title '%s' w lp pt 7 ps %.1f\n", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps;
@@ -390,7 +414,10 @@ for $i ( 0 .. $nteams -1 ) {
     }
 }
 
+printf $tt_ph "\n";
+printf $tt_pa "\n";
+printf $tt_gh "\n";
+printf $tt_ga "\n";
+
+
 close $of;
-
-
-
