@@ -40,12 +40,14 @@ while ( $line = <$fh> ) {
 
     push( @{ $results{names} }, @splitline[0] );
     push( @{ $results{abbrs} }, @splitline[1] );
+    push( @{ $results{colors} }, @splitline[2] );
 }
 close $fh or die "can't read close '$fp': $OS_ERROR";
 
 # delete spaces before and after the text
 s{^\s+|\s+$}{}g foreach @{ $results{names} };
 s{^\s+|\s+$}{}g foreach @{ $results{abbrs} };
+s{^\s+|\s+$}{}g foreach @{ $results{colors} };
 
 
 # gnuplot file
@@ -57,25 +59,17 @@ open($tgp, '>', $outfile_plot) or die "Could not open file $outputfile: $!";
 $outfile_plot_1 = $dir.$league."_plot_1.gp";
 open($tgp_1, '>', $outfile_plot_1) or die "Could not open file $outputfile: $!";	
 
-# points home
+# points home and away
 $outfile_plot_2 = $dir.$league."_plot_2.gp";
 open($tgp_2, '>', $outfile_plot_2) or die "Could not open file $outputfile: $!";	
 
-# points away
-$outfile_plot_3 = $dir.$league."_plot_3.gp";
-open($tgp_3, '>', $outfile_plot_3) or die "Could not open file $outputfile: $!";	
-
-# goals home
+# goals home and away
 $outfile_plot_4 = $dir.$league."_plot_4.gp";
 open($tgp_4, '>', $outfile_plot_4) or die "Could not open file $outputfile: $!";	
 
-# goals away
-$outfile_plot_5 = $dir.$league."_plot_5.gp";
-open($tgp_5, '>', $outfile_plot_5) or die "Could not open file $outputfile: $!";	
-
 # points evolution
 $outfile_plot_6 = $dir.$league."_plot_6.gp";
-open($tgp_6, '>', $outfile_plot_3) or die "Could not open file $outputfile: $!";	
+open($tgp_6, '>', $outfile_plot_6) or die "Could not open file $outputfile: $!";	
 
 # games
 $outfile_plot_7 = $dir.$league."_plot_7.gp";
@@ -91,7 +85,7 @@ printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set multiplot";
 
 printf $tgp_1 "set size   0.8, 0.08\n";
-printf $tgp_1 "set origin 0.0, 0.91\n";
+printf $tgp_1 "set origin 0.0, 0.58\n";
 printf $tgp_1 "set lmargin 7\n";
 printf $tgp_1 "set rmargin 0\n";
 printf $tgp_1 "set tmargin 0\n";
@@ -106,8 +100,8 @@ printf $tgp_1 "set format x ''\n";
 printf $tgp_1 "set format y ''\n";
 printf $tgp_1 "set tics scale 0\n";
 
-printf $tgp_2 "set size   0.2, 0.3\n";
-printf $tgp_2 "set origin 0.0, 0.6\n";
+printf $tgp_2 "set size   0.4, 0.3\n";
+printf $tgp_2 "set origin 0.0, 0.68\n";
 printf $tgp_2 "unset label\n";
 printf $tgp_2 "set lmargin 7\n";
 printf $tgp_2 "set rmargin 0\n";
@@ -115,35 +109,19 @@ printf $tgp_2 "set tmargin 0\n";
 printf $tgp_2 "set bmargin 0\n";
 printf $tgp_2 "set grid ytics\n";
 printf $tgp_2 "set border 15\n";
-printf $tgp_2 "set xrange [0:%.1f]\n", $nteams + 1;
+printf $tgp_2 "set xrange [0:%.0f]\n", 2*($nteams + 1);
 printf $tgp_2 "set yrange [0:10 < * < 200]\n"; 
+printf $tgp_2 "set style fill solid\n";
+printf $tgp_2 "set boxwidth 1.0\n";
 printf $tgp_2 "unset xlabel\n";
 printf $tgp_2 "set ylabe 'Points'\n";
-printf $tgp_2 "unset xtics\n";
+printf $tgp_2 "set xtics ('Heim' %.1f, 'Gast' %.1f) offset 0, 0.5\n", ($nteams + 1)/2, 3*($nteams + 1)/2;
 printf $tgp_2 "set format x ''\n";
 printf $tgp_2 "set format y '%s'\n", "%.0f";
 printf $tgp_2 "set tics scale 1\n";
 
-printf $tgp_3 "set size   0.2, 0.3\n";
-printf $tgp_3 "set origin 0.2, 0.6\n";
-printf $tgp_3 "unset label\n";
-printf $tgp_3 "set lmargin 7\n";
-printf $tgp_3 "set rmargin 0\n";
-printf $tgp_3 "set tmargin 0\n";
-printf $tgp_3 "set bmargin 0\n";
-printf $tgp_3 "set grid ytics\n";
-printf $tgp_3 "set border 15\n";
-printf $tgp_3 "set xrange [0:%.1f]\n", $nteams + 1;
-printf $tgp_3 "set yrange [0:10 < * < 200]\n"; 
-printf $tgp_3 "unset xlabel\n";
-printf $tgp_3 "set ylabe 'Points'\n";
-printf $tgp_3 "unset xtics\n";
-printf $tgp_3 "set format x ''\n";
-printf $tgp_3 "set format y '%s'\n", "%.0f";
-printf $tgp_3 "set tics scale 1\n";
-
-printf $tgp_4 "set size   0.2, 0.3\n";
-printf $tgp_4 "set origin 0.4, 0.6\n";
+printf $tgp_4 "set size   0.4, 0.3\n";
+printf $tgp_4 "set origin 0.4, 0.68\n";
 printf $tgp_4 "unset label\n";
 printf $tgp_4 "set lmargin 7\n";
 printf $tgp_4 "set rmargin 0\n";
@@ -151,32 +129,16 @@ printf $tgp_4 "set tmargin 0\n";
 printf $tgp_4 "set bmargin 0\n";
 printf $tgp_4 "set grid ytics\n";
 printf $tgp_4 "set border 15\n";
-printf $tgp_4 "set xrange [0:%.1f]\n", $nteams + 1;
+printf $tgp_4 "set xrange [0:%.0f]\n", 2*($nteams + 1);
 printf $tgp_4 "set yrange [0:10 < * < 200]\n"; 
+printf $tgp_4 "set style fill solid\n";
+printf $tgp_4 "set boxwidth 1.0\n";
 printf $tgp_4 "unset xlabel\n";
 printf $tgp_4 "set ylabe 'Goals'\n";
-printf $tgp_4 "unset xtics\n";
+printf $tgp_4 "set xtics ('Heim' %.1f, 'Gast' %.1f) offset 0, 0.5\n", ($nteams + 1)/2, 3*($nteams + 1)/2;
 printf $tgp_4 "set format x ''\n";
 printf $tgp_4 "set format y '%s'\n", "%.0f";
 printf $tgp_4 "set tics scale 1\n";
-
-printf $tgp_5 "set size   0.2, 0.3\n";
-printf $tgp_5 "set origin 0.6, 0.6\n";
-printf $tgp_5 "unset label\n";
-printf $tgp_5 "set lmargin 7\n";
-printf $tgp_5 "set rmargin 0\n";
-printf $tgp_5 "set tmargin 0\n";
-printf $tgp_5 "set bmargin 0\n";
-printf $tgp_5 "set grid ytics\n";
-printf $tgp_5 "set border 15\n";
-printf $tgp_5 "set xrange [0:%.1f]\n", $nteams + 1;
-printf $tgp_5 "set yrange [0:10 < * < 200]\n"; 
-printf $tgp_5 "unset xlabel\n";
-printf $tgp_5 "set ylabe 'Goals'\n";
-printf $tgp_5 "unset xtics\n";
-printf $tgp_5 "set format x ''\n";
-printf $tgp_5 "set format y '%s'\n", "%.0f";
-printf $tgp_5 "set tics scale 1\n";
 
 printf $tgp_6 "set size   0.8, 0.38\n";
 printf $tgp_6 "set origin 0.0, 0.20\n";
@@ -468,6 +430,7 @@ my @idx = sort { -$results{points}[$a] <=> -$results{points}[$b] ||
 @{ $results_tmp{lost} }    = @{ $results{lost} }[@idx];
 @{ $results_tmp{draw} }    = @{ $results{draw} }[@idx];
 @{ $results_tmp{games} }   = @{ $results{games} }[@idx];
+@{ $results_tmp{colors} }   = @{ $results{colors} }[@idx];
 
 
 $xmax = 1.2*$sp;
@@ -479,8 +442,9 @@ if ($ymax*5 != 6*($nteams - 1) ){
 
 $ymax = 1.2 * ($ymax * 5 );
 
-printf $tgp_2 "%s", "plot ";
-printf $tgp_6 "%s", "plot ";
+printf $tgp_2 "plot ";
+printf $tgp_4 "plot ";
+printf $tgp_6 "plot ";
 
 for $i ( 0 .. $nteams -1 ) {
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
@@ -493,18 +457,20 @@ for $i ( 0 .. $nteams -1 ) {
     printf $tt_ga "\t%.0f\t", $results{agoals}[$i];
 
     if ( $i == $nteams -1 ) {
-	printf $tgp_2 "'table_pts_h.dat' u (%.0f):%.0f notitle w bar lc rgb '%s'\n", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_3 "'table_pts_a.dat' u (%.0f):%.0f notitle w bar lc rgb '%s'\n", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_4 "'table_goals_h.dat' u (%.0f):%.0f notitle w bar lc rgb '%s'\n", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_5 "'table_goals_a.dat' u (%.0f):%.0f notitle w bar lc rgb '%s'\n", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_6 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 ps %.1f\n", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps;
+	printf $tgp_2 "'table_pts_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_2 "'table_pts_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s'\n", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_4 "'table_goals_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_4 "'table_goals_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s'\n", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
+
+	printf $tgp_6 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s'\n", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];;
 
     } else {
-	printf $tgp_2 "'table_pts_h.dat' u (%.0f):%.0f notitle w bar lc rgb '%s',", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_3 "'table_pts_a.dat' u (%.0f):%.0f notitle w bar lc rgb '%s',", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_4 "'table_goals_h.dat' u (%.0f):%.0f notitle w bar lc rgb '%s',", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_5 "'table_goals_a.dat' u (%.0f):%.0f notitle w bar lc rgb '%s',", $i, $idx[$i] + 1, "ariel";
-	printf $tgp_6 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 ps %.1f,", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps;
+	printf $tgp_2 "'table_pts_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_2 "'table_pts_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_4 "'table_goals_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
+	printf $tgp_4 "'table_goals_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
+
+	printf $tgp_6 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s',", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];
     }
 }
 

@@ -1,13 +1,13 @@
-1. FC Penzberg II		&	PENZBERG
-FC Traubing    			& 	TRAUBING
-SV Haunshofen			&	HAUNSHOV
-SV Wielenbach II		&	WIELENBA
-SV Münsing-A. II		&	MUENSING
-TSV 1847 Weilheim II		&	WEILHEIM
-FC Seeshaupt 			&	SEESHAUP
-SV Bad Heilbrunn II	   	&	HEILBRUN
-SV Eurasburg-Beuerberg II	&	EURASBUR
-SV Eberfing II			&	EBERFING
-TSV Königsdorf			& 	KOENIGDO
-SV Bernried			& 	BERNRIED
-TSV Schäftlarn II		&	SCHAEFTL
+SV Bernried			& 	BERNRIED	&	#FFFF0F
+SV Eberfing II			&	EBERFING	&	#FFCFFF
+SV Eurasburg-Beuerberg II	&	EURASBUR	&	#FFFFFF
+SV Haunshofen			&	HAUNSHOV	&	#FF1FFF
+SV Bad Heilbrunn II	   	&	HEILBRUN	&	#FFFFFF
+TSV Königsdorf			& 	KOENIGDO	&	#FFF103
+SV Münsing-A. II		&	MUENSING	&	#FFCCCC
+1. FC Penzberg II		&	PENZBERG	&	#FF50CC
+TSV Schäftlarn II		&	SCHAEFTL	&	#FF4020
+FC Seeshaupt 			&	SEESHAUP	&	#FFFFFF
+FC Traubing    			& 	TRAUBING	&	#CCCFFF
+TSV 1847 Weilheim II		&	WEILHEIM	&	#CCFFFF
+SV Wielenbach II		&	WIELENBA	&	#F3420F
