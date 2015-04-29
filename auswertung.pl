@@ -85,7 +85,7 @@ printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set multiplot";
 
 printf $tgp_1 "set size   0.8, 0.08\n";
-printf $tgp_1 "set origin 0.0, 0.58\n";
+printf $tgp_1 "set origin 0.0, 0.68\n";
 printf $tgp_1 "set lmargin 7\n";
 printf $tgp_1 "set rmargin 0\n";
 printf $tgp_1 "set tmargin 0\n";
@@ -100,8 +100,8 @@ printf $tgp_1 "set format x ''\n";
 printf $tgp_1 "set format y ''\n";
 printf $tgp_1 "set tics scale 0\n";
 
-printf $tgp_2 "set size   0.4, 0.3\n";
-printf $tgp_2 "set origin 0.0, 0.68\n";
+printf $tgp_2 "set size   0.4, 0.20\n";
+printf $tgp_2 "set origin 0.0, 0.78\n";
 printf $tgp_2 "unset label\n";
 printf $tgp_2 "set lmargin 7\n";
 printf $tgp_2 "set rmargin 0\n";
@@ -118,10 +118,10 @@ printf $tgp_2 "set ylabe 'Points'\n";
 printf $tgp_2 "set xtics ('Heim' %.1f, 'Gast' %.1f) offset 0, 0.5\n", ($nteams + 1)/2, 3*($nteams + 1)/2;
 printf $tgp_2 "set format x ''\n";
 printf $tgp_2 "set format y '%s'\n", "%.0f";
-printf $tgp_2 "set tics scale 1\n";
+printf $tgp_2 "set tics scale 0\n";
 
-printf $tgp_4 "set size   0.4, 0.3\n";
-printf $tgp_4 "set origin 0.4, 0.68\n";
+printf $tgp_4 "set size   0.4, 0.20\n";
+printf $tgp_4 "set origin 0.4, 0.78\n";
 printf $tgp_4 "unset label\n";
 printf $tgp_4 "set lmargin 7\n";
 printf $tgp_4 "set rmargin 0\n";
@@ -138,10 +138,10 @@ printf $tgp_4 "set ylabe 'Goals'\n";
 printf $tgp_4 "set xtics ('Heim' %.1f, 'Gast' %.1f) offset 0, 0.5\n", ($nteams + 1)/2, 3*($nteams + 1)/2;
 printf $tgp_4 "set format x ''\n";
 printf $tgp_4 "set format y '%s'\n", "%.0f";
-printf $tgp_4 "set tics scale 1\n";
+printf $tgp_4 "set tics scale 0\n";
 
-printf $tgp_6 "set size   0.8, 0.38\n";
-printf $tgp_6 "set origin 0.0, 0.20\n";
+printf $tgp_6 "set size   0.8, 0.32\n";
+printf $tgp_6 "set origin 0.0, 0.36\n";
 printf $tgp_6 "unset label\n";
 printf $tgp_6 "set lmargin 7\n";
 printf $tgp_6 "set rmargin 0\n";
@@ -157,7 +157,7 @@ printf $tgp_6 "set format x '%s'\n", "%.0f";
 printf $tgp_6 "set format y '%s'\n", "%.0f";
 printf $tgp_6 "set tics scale 1\n";
 
-printf $tgp_7 "set size   0.8, 0.13\n";
+printf $tgp_7 "set size   0.8, 0.25\n";
 printf $tgp_7 "set origin 0.0, 0.01\n";
 printf $tgp_7 "unset label\n";
 printf $tgp_7 "set lmargin 7\n";
@@ -167,12 +167,12 @@ printf $tgp_7 "set bmargin 0\n";
 printf $tgp_7 "unset grid\n";
 printf $tgp_7 "set border 15\n";
 printf $tgp_7 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
-printf $tgp_7 "set yrange [0:40]\n";
+printf $tgp_7 "set yrange [0:30]\n";
 printf $tgp_7 "unset xlabel\n";
 printf $tgp_7 "unset ylabel\n";
 printf $tgp_7 "set format x ''\n";
 printf $tgp_7 "set format y ''\n";
-printf $tgp_7 "set tics scale 1\n";
+printf $tgp_7 "set tics scale 0\n";
 
 printf $tgp_8 "set size   0.15, 1.0\n";
 printf $tgp_8 "set origin 0.85, 0.0\n";
@@ -257,13 +257,24 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 
     open my $fh, "<", $ft or die "can't read open '$fp': $OS_ERROR";
 
+    
+    $pos_sp = 3*( int(($sp - 1)/3)  + 1) - 1; 
+    
     if (  $sp - 3*int($sp/3) == 1 ) { 
-	$pos_foot = 30;
+	$pos_foot = 27;
     } elsif ( $sp - 3*int($sp/3) == 2 ) {
-	$pos_foot = 20;
+	$pos_foot = 17;
     } else {
-	$pos_foot = 10;
+	$pos_foot = 7;
     }
+
+    printf $tgp_7 "set label '%s' at %.1f, %.1f center tc rgb 'black' font 'Courier,6'\n", 
+    $sp, $pos_sp, $pos_foot + 1; 
+
+#line
+    
+    
+
 
     while ( $line = <$fh> ) {
 	@splitline = split("&", $line);
@@ -278,8 +289,9 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    }
 	}
 
-	printf $tgp_7 "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,4'\n", 
-	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $sp, $pos_foot; 
+	printf $tgp_7 "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,5'\n", 
+	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $pos_sp, $pos_foot; 
+
 	$pos_foot -= 1; 
 
 	if ( looks_like_number($splitline[3]) ) {
