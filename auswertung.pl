@@ -140,8 +140,8 @@ printf $tgp_4 "set format x ''\n";
 printf $tgp_4 "set format y '%s'\n", "%.0f";
 printf $tgp_4 "set tics scale 0\n";
 
-printf $tgp_6 "set size   0.8, 0.32\n";
-printf $tgp_6 "set origin 0.0, 0.36\n";
+printf $tgp_6 "set size   0.8, 0.36\n";
+printf $tgp_6 "set origin 0.0, 0.32\n";
 printf $tgp_6 "unset label\n";
 printf $tgp_6 "set lmargin 7\n";
 printf $tgp_6 "set rmargin 0\n";
@@ -165,7 +165,7 @@ printf $tgp_7 "set rmargin 0\n";
 printf $tgp_7 "set tmargin 0\n";
 printf $tgp_7 "set bmargin 0\n";
 printf $tgp_7 "unset grid\n";
-printf $tgp_7 "set border 15\n";
+printf $tgp_7 "set border 0\n";
 printf $tgp_7 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_7 "set yrange [0:30]\n";
 printf $tgp_7 "unset xlabel\n";
@@ -268,13 +268,25 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	$pos_foot = 7;
     }
 
+    # number
     printf $tgp_7 "set label '%s' at %.1f, %.1f center tc rgb 'black' font 'Courier,6'\n", 
     $sp, $pos_sp, $pos_foot + 1; 
 
-#line
-    
-    
+    # horizontal lines
+    printf $tgp_7 "set arrow from %.1f,%.1f to %.1f,%.1f nohead lc rgb 'black'\n",  
+    $pos_sp - 1.45, $pos_foot + 2, $pos_sp + 1.45, $pos_foot + 2; 
 
+    printf $tgp_7 "set arrow from %.1f,%.1f to %.1f,%.1f nohead lc rgb 'black'\n",  
+    $pos_sp - 1.45, $pos_foot - 6, $pos_sp + 1.45, $pos_foot - 6; 
+
+    # vertical lines
+    printf $tgp_7 "set arrow from %.1f,%.1f to %.1f,%.1f nohead lc rgb 'black'\n",  
+    $pos_sp - 1.45, $pos_foot + 2, $pos_sp - 1.45, $pos_foot - 6; 
+
+    printf $tgp_7 "set arrow from %.1f,%.1f to %.1f,%.1f nohead lc rgb 'black'\n",  
+    $pos_sp + 1.45, $pos_foot + 2, $pos_sp + 1.45, $pos_foot - 6; 
+    
+    
 
     while ( $line = <$fh> ) {
 	@splitline = split("&", $line);
@@ -289,7 +301,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    }
 	}
 
-	printf $tgp_7 "set label '%s %.0f  %s %.0f' at %.1f, %.1f center tc rgb 'black' font 'Courier,5'\n", 
+	printf $tgp_7 "set label '%s %s  %s %s' at %.1f, %.1f center tc rgb 'black' font 'Courier,5'\n", 
 	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $pos_sp, $pos_foot; 
 
 	$pos_foot -= 1; 
