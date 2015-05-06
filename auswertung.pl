@@ -88,22 +88,6 @@ printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set multiplot";
 
-printf $tgp_3 "set size   0.8, 0.08\n";
-printf $tgp_3 "set origin 0.0, 0.68\n";
-printf $tgp_3 "set lmargin 7\n";
-printf $tgp_3 "set rmargin 0\n";
-printf $tgp_3 "set tmargin 0\n";
-printf $tgp_3 "set bmargin 0\n";
-printf $tgp_3 "unset grid\n";
-printf $tgp_3 "set border 0\n";
-printf $tgp_3 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
-printf $tgp_3 "set yrange [0:14]\n";
-printf $tgp_3 "unset xlabel\n";
-printf $tgp_3 "unset ylabel\n";
-printf $tgp_3 "set format x ''\n";
-printf $tgp_3 "set format y ''\n";
-printf $tgp_3 "set tics scale 0\n";
-
 printf $tgp_1 "set size   0.4, 0.20\n";
 printf $tgp_1 "set origin 0.0, 0.78\n";
 printf $tgp_1 "unset label\n";
@@ -144,6 +128,23 @@ printf $tgp_2 "set format x ''\n";
 printf $tgp_2 "set format y '%s'\n", "%.0f";
 printf $tgp_2 "set tics scale 0\n";
 
+printf $tgp_3 "set size   0.8, 0.08\n";
+printf $tgp_3 "set origin 0.0, 0.68\n";
+printf $tgp_3 "set lmargin 7\n";
+printf $tgp_3 "set rmargin 0\n";
+printf $tgp_3 "set tmargin 0\n";
+printf $tgp_3 "set bmargin 0\n";
+printf $tgp_3 "unset label\n";
+printf $tgp_3 "unset grid\n";
+printf $tgp_3 "set border 0\n";
+printf $tgp_3 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
+printf $tgp_3 "set yrange [0:14]\n";
+printf $tgp_3 "unset xlabel\n";
+printf $tgp_3 "unset ylabel\n";
+printf $tgp_3 "set format x ''\n";
+printf $tgp_3 "set format y ''\n";
+printf $tgp_3 "set tics scale 0\n";
+
 printf $tgp_4 "set size   0.8, 0.36\n";
 printf $tgp_4 "set origin 0.0, 0.32\n";
 printf $tgp_4 "unset label\n";
@@ -178,14 +179,18 @@ printf $tgp_5 "set format x ''\n";
 printf $tgp_5 "set format y ''\n";
 printf $tgp_5 "set tics scale 0\n";
 
-printf $tgp_6 "set size   0.15, 1.0\n";
-printf $tgp_6 "set origin 0.85, 0.0\n";
+printf $tgp_6 "set size   0.16, 0.50\n";
+printf $tgp_6 "set origin 0.82, 0.40\n";
 printf $tgp_6 "unset label\n";
-printf $tgp_6 "set lmargin 10\n";
+printf $tgp_6 "unset arrow\n";
+printf $tgp_6 "set lmargin 0\n";
+printf $tgp_6 "set rmargin 0\n";
+printf $tgp_6 "set tmargin 0\n";
+printf $tgp_6 "set bmargin 0\n";
 printf $tgp_6 "unset grid\n";
-printf $tgp_6 "set border 0\n";
-printf $tgp_6 "set xrange [0:20]\n";
-printf $tgp_6 "set yrange [0:100]\n";
+printf $tgp_6 "set border 15\n";
+printf $tgp_6 "set xrange [0:10]\n";
+printf $tgp_6 "set yrange [0:20]\n";
 printf $tgp_6 "unset xlabel\n";
 printf $tgp_6 "unset ylabel\n";
 printf $tgp_6 "unset xtics\n";
@@ -475,7 +480,32 @@ printf $tgp_2 "plot ";
 printf $tgp_4 "plot ";
 
 for $i ( 0 .. $nteams -1 ) {
-    printf $tgp_6 "'table_pts_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
+   printf $tgp_6 "set arrow from 0,%.1f to 1,%.1f nohead lc rgb '%s' lw 5\n",
+   , 19 - $i, 19 - $i, $results_tmp{colors}[$i];
+
+   printf $tgp_6 "set label '%s' at 1.5,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{abbrs}[$i], 19 - $i;
+
+   printf $tgp_6 "set label '%s' at 4.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{games}[$i], 19 - $i;
+
+   printf $tgp_6 "set label '%s' at 6.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{points}[$i], 19 - $i;
+
+   printf $tgp_6 "set label '%s-%s' at 8.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 19 - $i;
+
+
+   printf $tgp_6 "set label '%s' at 10.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{won}[$i], 19 - $i;
+
+   printf $tgp_6 "set label '%s' at 12.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{lost}[$i], 19 - $i;
+
+   printf $tgp_6 "set label '%s' at 14.0,%.1f tc rgb 'black' font 'Courier,10'\n",
+   , $results_tmp{draw}[$i], 19 - $i;
+
+
 
 
     printf $of "%s %.0f %.0f %.0f %.0f %.0f %.0f %.0f\n", $results_tmp{abbrs}[$i], $results_tmp{games}[$i], 
@@ -510,5 +540,7 @@ printf $tt_pa "\n";
 printf $tt_gh "\n";
 printf $tt_ga "\n";
 
+printf $tgp_6 "plot 'empty.dat' notitle\n";
+#printf $tgp_7 "plot 'empty.dat' notitle\n";
 
 close $of;
