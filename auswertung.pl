@@ -197,6 +197,24 @@ printf $tgp_6 "unset xtics\n";
 printf $tgp_6 "unset ytics\n";
 printf $tgp_6 "set tics scale 0\n";
 
+printf $tgp_7 "set size   0.16, 0.30\n";
+printf $tgp_7 "set origin 0.82, 0.00\n";
+printf $tgp_7 "unset label\n";
+printf $tgp_7 "unset arrow\n";
+printf $tgp_7 "set lmargin 0\n";
+printf $tgp_7 "set rmargin 0\n";
+printf $tgp_7 "set tmargin 0\n";
+printf $tgp_7 "set bmargin 0\n";
+printf $tgp_7 "unset grid\n";
+printf $tgp_7 "set border 15\n";
+printf $tgp_7 "set xrange [0:7]\n";
+printf $tgp_7 "set yrange [0:15]\n";
+printf $tgp_7 "unset xlabel\n";
+printf $tgp_7 "unset ylabel\n";
+printf $tgp_7 "unset xtics\n";
+printf $tgp_7 "unset ytics\n";
+printf $tgp_7 "set tics scale 0\n";
+
 
 # this file contains the data to be plotted
 $outfile_points = $dir."table_teams_points.dat";
@@ -553,6 +571,8 @@ printf $tt_pa "\n";
 printf $tt_gh "\n";
 printf $tt_ga "\n";
 
+printf $tgp_6 "plot 'empty.dat' notitle\n";
+
 for $i ( 0 .. $nteams -1 ) {
       $results{slgpoints}[$i] = sum( @{ $results{lgpoints}[$i] } );
       $results{slgdgoals}[$i] = sum( @{ $results{lgdgoals}[$i] } );
@@ -567,9 +587,14 @@ my @idx = sort { -$results{slgpoints}[$a] <=> -$results{slgpoints}[$b] ||
 @{ $results_tmp{slgdgoals} }  = @{ $results{slgdgoals} }[@idx];
 
 
+for $i ( 0 .. $nteams -1 ) {
+    printf $tgp_7 "set label '%s' at 1.5,%.1f tc rgb 'black' font 'Courier,8'\n",
+    $results_tmp{abbrs}[$i], 14 - $i;
+    printf $tgp_7 "set label '%s' at 5.5,%.1f tc rgb 'black' font 'Courier,8'\n",
+    $results_tmp{slgpoints}[$i], 14 - $i;
+}
 
-printf $tgp_6 "plot 'empty.dat' notitle\n";
-#printf $tgp_7 "plot 'empty.dat' notitle\n";
+printf $tgp_7 "plot 'empty.dat' notitle\n";
 
 
 close $of;
