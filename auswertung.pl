@@ -241,7 +241,12 @@ for $i ( 0 .. $nteams - 1 ) {
     $results{apoints}[$i] = 0;   # points collected away
     $results{hgoals}[$i] = 0;    # goals at home
     $results{agoals}[$i] = 0;    # goals away
-    $results{lgpoints}[$i] = [0, 0, 0];   # points of the last 4 games
+
+    $results{lgpoints}[$i] = [0, 0, 0, 0];   # points of the last 4 games
+    $results{lgdgoals}[$i] = [0, 0, 0, 0];   # diff goals of the last 4 games
+    $results{slgpoints}[$i] = 0;  # sum points of the last 4 games
+    $results{slgdgoals}[$i] = 0;   # sum diff goals of the last 4 games
+
 
     printf $tt_points "\t%s", $results{abbrs}[$i];
     printf $tt_ph "\t%s", $results{abbrs}[$i];
@@ -323,6 +328,8 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    $results{gdiff}[$ihome]     += $splitline[3] - $splitline[4];
 	    $results{hgoals}[$ihome]    += $splitline[3];
 
+	    push @{ $results{lgdgoals}[$ihome] }, $splitline[3] - $splitline[4];
+
 	    $results{played}[$iguest]   = 1; # boolean
 	    $results{games}[$iguest]    += 1;
 	    $results{gfavor}[$iguest]   += $splitline[4];
@@ -330,26 +337,30 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    $results{gdiff}[$iguest]    += $splitline[4] - $splitline[3];
 	    $results{agoals}[$iguest]   += $splitline[4];
 
+	    push @{ $results{lgdgoals}[$iguest] }, $splitline[4] - $splitline[3];
 
 	    if ( $splitline[3] > $splitline[4] ) {      # home victory
+		push @{ $results{lgpoints}[$ihome] } , 3;   # points of the last 4 games
+		push @{ $results{lgpoints}[$iguest] } , 0;   # points of the last 4 games
+
 		$results{won}[$ihome]      += 1;
 		$results{lost}[$iguest]    += 1;
 		$results{points}[$ihome]   += 3;
 		$results{hpoints}[$ihome]  += 3;
 
-		#push @results{lgpoints}[$ihome], 3;
-		#push @results{lgpoints}[$iguest], 0;
-
 	    } elsif ( $splitline[3] < $splitline[4] ) { # home defeat
+		push @{ $results{lgpoints}[$ihome] } , 0;   # points of the last 4 games
+		push @{ $results{lgpoints}[$iguest] } , 3;   # points of the last 4 games
+
 		$results{lost}[$ihome]      += 1; 
 		$results{won}[$iguest]      += 1;
 		$results{points}[$iguest]   += 3;
 		$results{apoints}[$iguest]  += 3;
 
-		#push @results{lgpoints}[$ihome], 0;
-		#push @results{lgpoints}[$iguest], 3;
-
 	    } else {                                    # draw
+		push @{ $results{lgpoints}[$ihome] } , 1;   # points of the last 4 games
+		push @{ $results{lgpoints}[$iguest] } , 1;   # points of the last 4 games
+
 		$results{draw}[$ihome]      += 1; 
 		$results{points}[$ihome]    += 1;
 		$results{draw}[$iguest]     += 1; 
@@ -357,17 +368,19 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		$results{hpoints}[$ihome]   += 1;
 		$results{apoints}[$iguest]  += 1;
 
-		#push @results{lgpoints}[$ihome], 1;
-		#push @results{lgpoints}[$iguest], 1;
+
 	    }
 
-	    #if ( scalar @results{lgpoints}[$ihome] > 4) {
-		#$tmp = shift @results{lgpoints}[$ihome];
-	    #}
+	    if ( scalar @{ $results{lgpoints}[$ihome] } > 4 ) {
+		$tmp = shift @{ $results{lgpoints}[$ihome] };
+		$tmp = shift @{ $results{lgdgoals}[$ihome] };
+	    }
 
-	    #if ( scalar @results{lgpoints}[$iguest] > 4) {
-		#$tmp = shift @results{lgpoints}[$iguest];
-	    #}
+	    if ( scalar @{ $results{lgpoints}[$iguest] } > 4 ) {
+		$tmp = shift @{ $results{lgpoints}[$iguest] };
+		$tmp = shift @{ $results{lgdgoals}[$iguest] };
+	    }
+
 	}
     }
 
@@ -540,7 +553,23 @@ printf $tt_pa "\n";
 printf $tt_gh "\n";
 printf $tt_ga "\n";
 
+for $i ( 0 .. $nteams -1 ) {
+      $results{slgpoints}[$i] = sum( @{ $results{lgpoints}[$i] } );
+      $results{slgdgoals}[$i] = sum( @{ $results{lgdgoals}[$i] } );
+}
+
+# sorting bei points, then diff goals and then played games.
+my @idx = sort { -$results{slgpoints}[$a] <=> -$results{slgpoints}[$b] ||
+		     -$results{slggdiff}[$a] <=> -$results{lggdiff}[$b] } 0 .. $nteams - 1;
+
+@{ $results_tmp{abbrs} }   = @{ $results{abbrs} }[@idx];
+@{ $results_tmp{slgpoints} }  = @{ $results{slgpoints} }[@idx];
+@{ $results_tmp{slgdgoals} }  = @{ $results{slgdgoals} }[@idx];
+
+
+
 printf $tgp_6 "plot 'empty.dat' notitle\n";
 #printf $tgp_7 "plot 'empty.dat' notitle\n";
+
 
 close $of;
