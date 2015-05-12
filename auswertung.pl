@@ -11,6 +11,8 @@ use List::Util qw(sum);
 $league = $ARGV[0];
 
 $ps = 1.0; # point size
+$font = "Courier";
+$fontsize = 8;
 
 my $dir = './';
 
@@ -84,7 +86,7 @@ $outfile_plot_7 = $dir.$league."_plot_7.gp";
 open($tgp_7, '>', $outfile_plot_7) or die "Could not open file $outputfile: $!";	
 
 
-printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font 'Courier, 10'\n";
+printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font '$font, 10'\n";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set multiplot";
 
@@ -179,7 +181,7 @@ printf $tgp_5 "set format x ''\n";
 printf $tgp_5 "set format y ''\n";
 printf $tgp_5 "set tics scale 0\n";
 
-printf $tgp_6 "set size   0.16, 0.50\n";
+printf $tgp_6 "set size   0.20, 0.25\n";
 printf $tgp_6 "set origin 0.82, 0.40\n";
 printf $tgp_6 "unset label\n";
 printf $tgp_6 "unset arrow\n";
@@ -189,7 +191,7 @@ printf $tgp_6 "set tmargin 0\n";
 printf $tgp_6 "set bmargin 0\n";
 printf $tgp_6 "unset grid\n";
 printf $tgp_6 "set border 15\n";
-printf $tgp_6 "set xrange [0:10]\n";
+printf $tgp_6 "set xrange [0:15]\n";
 printf $tgp_6 "set yrange [0:20]\n";
 printf $tgp_6 "unset xlabel\n";
 printf $tgp_6 "unset ylabel\n";
@@ -197,8 +199,8 @@ printf $tgp_6 "unset xtics\n";
 printf $tgp_6 "unset ytics\n";
 printf $tgp_6 "set tics scale 0\n";
 
-printf $tgp_7 "set size   0.16, 0.30\n";
-printf $tgp_7 "set origin 0.82, 0.00\n";
+printf $tgp_7 "set size   0.08, 0.25\n";
+printf $tgp_7 "set origin 0.90, 0.00\n";
 printf $tgp_7 "unset label\n";
 printf $tgp_7 "unset arrow\n";
 printf $tgp_7 "set lmargin 0\n";
@@ -206,9 +208,9 @@ printf $tgp_7 "set rmargin 0\n";
 printf $tgp_7 "set tmargin 0\n";
 printf $tgp_7 "set bmargin 0\n";
 printf $tgp_7 "unset grid\n";
-printf $tgp_7 "set border 15\n";
-printf $tgp_7 "set xrange [0:7]\n";
-printf $tgp_7 "set yrange [0:15]\n";
+printf $tgp_7 "set border 0\n";
+printf $tgp_7 "set xrange [0:5]\n";
+printf $tgp_7 "set yrange [0:20]\n";
 printf $tgp_7 "unset xlabel\n";
 printf $tgp_7 "unset ylabel\n";
 printf $tgp_7 "unset xtics\n";
@@ -301,7 +303,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
     }
 
     # number
-    printf $tgp_5 "set label '%s' at %.1f, %.1f center tc rgb 'black' font 'Courier,6'\n", 
+    printf $tgp_5 "set label '%s' at %.1f, %.1f center tc rgb 'black' font '$font,6'\n", 
     $sp, $pos_sp, $pos_foot + 1; 
 
     # horizontal lines
@@ -333,7 +335,7 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 	    }
 	}
 
-	printf $tgp_5 "set label '%s %s  %s %s' at %.1f, %.1f center tc rgb 'black' font 'Courier,5'\n", 
+	printf $tgp_5 "set label '%s %s  %s %s' at %.1f, %.1f center tc rgb 'black' font '$font,5'\n", 
 	$results{abbrs}[$ihome], $splitline[3], $results{abbrs}[$iguest], $splitline[4], $pos_sp, $pos_foot; 
 
 	$pos_foot -= 1; 
@@ -428,26 +430,26 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
 		if ( $i == $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,4'\n", 
+		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font '$font,4'\n", 
 		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		} elsif ( $i < $icomp ) {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "1";
 
-		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'green' font 'Courier,4'\n", 
+		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'green' font '$font,4'\n", 
 		    $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		} else {
 		    printf $of "%s %s\n", $results_tmp{abbrs}[$i], "-1";
 
-		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'red' font 'Courier,4'\n", 
+		    printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'red' font '$font,4'\n", 
 		     $results_tmp{abbrs}[$i], $sp, $pos_head; 
 		    $pos_head -= 1; 
 		}
 	    } else {
 		printf $of "%s %s\n", $results_tmp{abbrs}[$i], "0";
 
-		printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font 'Courier,4'\n", 
+		printf $tgp_3 "set label '%s' at %.1f, %.1f center tc rgb 'gray' font '$font,4'\n", 
 		$results_tmp{abbrs}[$i], $sp, $pos_head; 
 		$pos_head -= 1;
 	
@@ -512,29 +514,29 @@ printf $tgp_4 "plot ";
 
 for $i ( 0 .. $nteams -1 ) {
    printf $tgp_6 "set arrow from 0,%.1f to 1,%.1f nohead lc rgb '%s' lw 5\n",
-   , 19 - $i, 19 - $i, $results_tmp{colors}[$i];
+   , 15 - $i, 15 - $i, $results_tmp{colors}[$i];
 
-   printf $tgp_6 "set label '%s' at 1.5,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{abbrs}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 1.5,%.1f left tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{abbrs}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s' at 4.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{games}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 5.0,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{games}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s' at 6.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{points}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 6.0,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{points}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s-%s' at 8.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s-%s' at 7.0,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{gfavor}[$i], $results_tmp{gcontra}[$i], 15 - $i;
 
 
-   printf $tgp_6 "set label '%s' at 10.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{won}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 9.5,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{won}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s' at 12.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{lost}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 11.0,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{lost}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s' at 14.0,%.1f tc rgb 'black' font 'Courier,10'\n",
-   , $results_tmp{draw}[$i], 19 - $i;
+   printf $tgp_6 "set label '%s' at 12.5,%.1f right tc rgb 'black' font '$font,$fontsize'\n",
+   , $results_tmp{draw}[$i], 15 - $i;
 
 
 
@@ -554,7 +556,7 @@ for $i ( 0 .. $nteams -1 ) {
 	printf $tgp_2 "'table_goals_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
 	printf $tgp_2 "'table_goals_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s'\n", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
 
-	printf $tgp_4 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s'\n", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];;
+	printf $tgp_4 "'table_teams_points.dat' u 1:%.0f notitle '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s'\n", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];;
 
     } else {
 	printf $tgp_1 "'table_pts_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
@@ -562,7 +564,7 @@ for $i ( 0 .. $nteams -1 ) {
 	printf $tgp_2 "'table_goals_h.dat' u (%.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $idx[$i] + 1, $results{colors}[$i];
 	printf $tgp_2 "'table_goals_a.dat' u (%.0f + %.0f):%.0f notitle w boxes lc rgb '%s',", $i + 1, $nteams + 1, $idx[$i] + 1, $results{colors}[$i];
 
-	printf $tgp_4 "'table_teams_points.dat' u 1:%.0f title '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s',", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];
+	printf $tgp_4 "'table_teams_points.dat' u 1:%.0f notitle '%s' w lp pt 7 lt 1 ps %.1f lc rgb '%s',", $idx[$i] + 2, $results_tmp{abbrs}[$i], $ps, $results_tmp{colors}[$i];
     }
 }
 
@@ -587,11 +589,14 @@ my @idx = sort { -$results{slgpoints}[$a] <=> -$results{slgpoints}[$b] ||
 @{ $results_tmp{slgdgoals} }  = @{ $results{slgdgoals} }[@idx];
 
 
+printf $tgp_7 "set label 'Tabelle:' at 2.5,19 center tc rgb 'black' font '$font,12'\n";
+printf $tgp_7 "set label 'Letzte 4 Spiele' at 2.5,18 center tc rgb 'black' font '$font,10'\n";
+
 for $i ( 0 .. $nteams -1 ) {
-    printf $tgp_7 "set label '%s' at 1.5,%.1f tc rgb 'black' font 'Courier,8'\n",
-    $results_tmp{abbrs}[$i], 14 - $i;
-    printf $tgp_7 "set label '%s' at 5.5,%.1f tc rgb 'black' font 'Courier,8'\n",
-    $results_tmp{slgpoints}[$i], 14 - $i;
+    printf $tgp_7 "set label '%s' at 0.5,%.1f tc rgb 'black' font '$font,8'\n",
+    $results_tmp{abbrs}[$i], 15 - $i;
+    printf $tgp_7 "set label '%s' at 4.5,%.1f tc rgb 'black' font '$font,8'\n",
+    $results_tmp{slgpoints}[$i], 15 - $i;
 }
 
 printf $tgp_7 "plot 'empty.dat' notitle\n";
