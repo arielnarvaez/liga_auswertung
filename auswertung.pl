@@ -132,15 +132,16 @@ printf $tgp_2 "set tics scale 0\n";
 
 printf $tgp_3 "set size   0.8, 0.08\n";
 printf $tgp_3 "set origin 0.0, 0.68\n";
+printf $tgp_3 "unset label\n";
 printf $tgp_3 "set lmargin 7\n";
 printf $tgp_3 "set rmargin 0\n";
 printf $tgp_3 "set tmargin 0\n";
 printf $tgp_3 "set bmargin 0\n";
-printf $tgp_3 "unset label\n";
 printf $tgp_3 "unset grid\n";
 printf $tgp_3 "set border 0\n";
 printf $tgp_3 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
 printf $tgp_3 "set yrange [0:14]\n";
+printf $tgp_3 "unset xtics\n";
 printf $tgp_3 "unset xlabel\n";
 printf $tgp_3 "unset ylabel\n";
 printf $tgp_3 "set format x ''\n";
@@ -215,6 +216,8 @@ printf $tgp_7 "unset xlabel\n";
 printf $tgp_7 "unset ylabel\n";
 printf $tgp_7 "unset xtics\n";
 printf $tgp_7 "unset ytics\n";
+printf $tgp_7 "set format x ''\n";
+printf $tgp_7 "set format y ''\n";
 printf $tgp_7 "set tics scale 0\n";
 
 
