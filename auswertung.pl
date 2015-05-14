@@ -134,7 +134,7 @@ printf $tgp_2 "set format x ''\n";
 printf $tgp_2 "set format y '%s'\n", "%.0f";
 printf $tgp_2 "set tics scale 0\n";
 
-printf $tgp_3 "set size   0.98, 0.10\n";
+printf $tgp_3 "set size   0.98, 0.12\n";
 printf $tgp_3 "set origin 0.00, 0.32\n";
 printf $tgp_3 "unset label\n";
 printf $tgp_3 "set lmargin 1\n";
@@ -144,7 +144,7 @@ printf $tgp_3 "set bmargin 0\n";
 printf $tgp_3 "unset grid\n";
 printf $tgp_3 "set border 0\n";
 printf $tgp_3 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
-printf $tgp_3 "set yrange [0:16.5]\n";
+printf $tgp_3 "set yrange [0:19]\n";
 printf $tgp_3 "unset xtics\n";
 printf $tgp_3 "unset xlabel\n";
 printf $tgp_3 "unset ylabel\n";
@@ -170,7 +170,7 @@ printf $tgp_4 "set format x '%s'\n", "%.0f";
 printf $tgp_4 "set format y '%s'\n", "%.0f";
 printf $tgp_4 "set tics scale 1\n";
 
-printf $tgp_5 "set size   0.8, 0.25\n";
+printf $tgp_5 "set size   0.8, 0.29\n";
 printf $tgp_5 "set origin 0.0, 0.01\n";
 printf $tgp_5 "unset label\n";
 printf $tgp_5 "unset arrow\n";
@@ -181,7 +181,7 @@ printf $tgp_5 "set bmargin 0\n";
 printf $tgp_5 "unset grid\n";
 printf $tgp_5 "set border 0\n";
 printf $tgp_5 "set xrange [0.5:%.1f]\n", $ngames + 0.5;
-printf $tgp_5 "set yrange [0:30]\n";
+printf $tgp_5 "set yrange [0:31]\n";
 printf $tgp_5 "unset xlabel\n";
 printf $tgp_5 "unset ylabel\n";
 printf $tgp_5 "set format x ''\n";
@@ -309,8 +309,6 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
     } else {
 	$pos_foot = 7;
     }
-
-    print "$sp $pos_sp $pos_foot\n";
 
     # number
     printf $tgp_5 "set label '%s' at %.2f, %.2f center tc rgb 'black' font '$font,$fsmttl'\n", 
@@ -502,8 +500,15 @@ foreach my $ft ( glob($dir.$league."_sp*.dat") ) {
     close $of;
 }
 
+printf $tgp_3 "set label 'Tabelleverlauf' at %.1f,19 center tc rgb 'black' font '$font,$fsttl'\n",
+    ($ngames + 0.5)/2; 
 printf $tgp_3 "plot 'empty.dat' notitle\n";
+
+printf $tgp_5 "set label 'Spiele' at %.1f,31 center tc rgb 'black' font '$font,$fsttl'\n",
+    ($ngames + 0.5)/2; 
 printf $tgp_5 "plot 'empty.dat' notitle\n";
+
+
 
 $outfile = $dir."final_table.dat";
 open($of, '>', $outfile) or die "Could not open file $outputfile: $!";	
@@ -539,6 +544,9 @@ printf $tgp_1 "plot ";
 printf $tgp_2 "plot ";
 printf $tgp_4 "plot ";
 
+printf $tgp_6 "set label 'Tabelle' at 7.5,18 center tc rgb 'black' font '$font,$fsttl'\n";
+
+
 for $i ( 0 .. $nteams -1 ) {
    printf $tgp_6 "set arrow from 0,%.1f to 1,%.1f nohead lc rgb '%s' lw 5\n",
    , 15 - $i, 15 - $i, $results_tmp{colors}[$i];
@@ -564,7 +572,6 @@ for $i ( 0 .. $nteams -1 ) {
 
    printf $tgp_6 "set label '%s' at 12.5,%.1f right tc rgb 'black' font '$font,$fstbl'\n",
    , $results_tmp{draw}[$i], 15 - $i;
-
 
 
 
@@ -617,7 +624,7 @@ my @idx = sort { -$results{slgpoints}[$a] <=> -$results{slgpoints}[$b] ||
 
 
 printf $tgp_7 "set label 'Tabelle:' at 2.5,19 center tc rgb 'black' font '$font,$fsttl'\n";
-printf $tgp_7 "set label 'Letzte 4 Spiele' at 2.5,18 center tc rgb 'black' font '$font,$fsstl'\n";
+printf $tgp_7 "set label 'nur letzter 4 Spiele' at 2.5,18 center tc rgb 'black' font '$font,$fsstl'\n";
 
 printf $tgp_7 "set label 'Pkt' at 5.0,16 right tc rgb 'black' font '$font,$fstbl'\n";
 for $i ( 0 .. $nteams -1 ) {
