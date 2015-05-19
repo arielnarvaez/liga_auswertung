@@ -90,7 +90,7 @@ $outfile_plot_7 = $dir.$league."_plot_7.gp";
 open($tgp_7, '>', $outfile_plot_7) or die "Could not open file $outputfile: $!";	
 
 
-printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 11.7in,8.3in font '$font, 10'\n";
+printf $tgp "set terminal postscript landscape enhanced color lw 1 rounded size 12.7in,8.3in font '$font, 10'\n";
 printf $tgp "%s%s%s\n", "set output '", $league,"_plot.eps'";
 printf $tgp "%s\n", "set multiplot";
 
