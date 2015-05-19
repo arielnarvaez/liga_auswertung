@@ -11,7 +11,7 @@ use List::Util qw(sum);
 $league = $ARGV[0];
 
 $ps = 0.6; # point size
-$font = "Courier";
+$font = "sans-serif";
 $fstbl = 8;    # font table
 $fsttl = 12;   # font title
 $fsstl = 10;   # font sub title
@@ -555,7 +555,7 @@ printf $tgp_4 "plot ";
 
 printf $tgp_6 "set label 'Tabelle' at 7.5,18 center tc rgb 'black' font '$font,$fsttl'\n";
 
-printf $tgp_6 "set label 'Spl' at 5.0,16 right tc rgb 'black' font '$font,$fstbl'\n";
+printf $tgp_6 "set label 'Spl' at 5.25,16 right tc rgb 'black' font '$font,$fstbl'\n";
 printf $tgp_6 "set label 'Pkt' at 6.5,16 right tc rgb 'black' font '$font,$fstbl'\n";
 printf $tgp_6 "set label 'Tore' at 8.75,16 right tc rgb 'black' font '$font,$fstbl'\n";
 printf $tgp_6 "set label 'S' at 10.5,16 right tc rgb 'black' font '$font,$fstbl'\n";
@@ -563,13 +563,16 @@ printf $tgp_6 "set label 'N' at 12,16 right tc rgb 'black' font '$font,$fstbl'\n
 printf $tgp_6 "set label 'U' at 13.5,16 right tc rgb 'black' font '$font,$fstbl'\n";
 
 for $i ( 0 .. $nteams -1 ) {
-   printf $tgp_6 "set arrow from 0,%.1f to 1,%.1f nohead lc rgb '%s' lw 5\n",
+   printf $tgp_6 "set label '%s' at 0.0,%.1f right tc rgb 'black' font '$font,$fstbl'\n",
+   , $i + 1, 15 - $i;
+
+   printf $tgp_6 "set arrow from 0.5,%.1f to 1.25,%.1f nohead lc rgb '%s' lw 5\n",
    , 15 - $i, 15 - $i, $results_tmp{colors}[$i];
 
-   printf $tgp_6 "set label '%s' at 1.5,%.1f left tc rgb 'black' font '$font,$fstbl'\n",
+   printf $tgp_6 "set label '%s' at 1.75,%.1f left tc rgb 'black' font '$font,$fstbl'\n",
    , $results_tmp{abbrs}[$i], 15 - $i;
 
-   printf $tgp_6 "set label '%s' at 5.0,%.1f right tc rgb 'black' font '$font,$fstbl'\n",
+   printf $tgp_6 "set label '%s' at 5.25,%.1f right tc rgb 'black' font '$font,$fstbl'\n",
    , $results_tmp{games}[$i], 15 - $i;
 
    printf $tgp_6 "set label '%s' at 6.5,%.1f right tc rgb 'black' font '$font,$fstbl'\n",
